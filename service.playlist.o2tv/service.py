@@ -9,31 +9,24 @@ který byl vytvořen z původního addon autora Štěpána Orta.
 *********************************************************
 '''
 
-import sys
 import os
-import xbmc
-import xbmcgui
-import xbmcplugin
-import xbmcaddon
-import urllib
-import httplib
-from urlparse import urlparse
-import json
-import traceback
 import random
+import stat
+import sys
+import time
+import unicodedata
 from uuid import getnode as get_mac
-from o2tvgo import O2TVGO
+
+import xbmc
+import xbmcaddon
+import xbmcgui
+
+import urllib3
 from o2tvgo import AuthenticationError
-from o2tvgo import TooManyDevicesError
 from o2tvgo import ChannelIsNotBroadcastingError
 from o2tvgo import NoPurchasedServiceError
-import xbmcvfs
-import time
-import _strptime
-import string
-import unicodedata
-import stat
-import urllib3
+from o2tvgo import O2TVGO
+from o2tvgo import TooManyDevicesError
 
 params = False
 
@@ -42,11 +35,11 @@ if __name__ == '__main__':
 
     _addon_ = xbmcaddon.Addon('service.playlist.o2tv')
     _profile_ = xbmc.translatePath(_addon_.getAddonInfo('profile'))
-    _lang_   = _addon_.getLocalizedString
+    _lang_ = _addon_.getLocalizedString
     _name_ = _addon_.getAddonInfo('name')
     _version_ = _addon_.getAddonInfo('version')
     _id_ = _addon_.getAddonInfo('id')
-    _icon_ = xbmc.translatePath(os.path.join(_addon_.getAddonInfo('path'), 'icon.png' ))
+    _icon_ = xbmc.translatePath(os.path.join(_addon_.getAddonInfo('path'), 'icon.png'))
 
     addon = xbmcaddon.Addon
     dialog = xbmcgui.Dialog()
@@ -67,8 +60,8 @@ if __name__ == '__main__':
     _toomany_error_ = 2
     _nopurch_error_ = 3
     _error_code_ = 0, 1, 2, 3
-    _error_str_ = 'OK','AuthenticationError','TooManyDevicesError','NoPurchasedServiceError'
-    _error_lang_ = 'OK',_lang_(30003),_lang_(30006),_lang_(30008)
+    _error_str_ = 'OK', 'AuthenticationError', 'TooManyDevicesError', 'NoPurchasedServiceError'
+    _error_lang_ = 'OK', _lang_(30003), _lang_(30006), _lang_(30008)
     _default_groupname_ = _lang_(30242)
     _quality_high_ = 'STB'
     _quality_low_ = 'TABLET'
@@ -82,15 +75,18 @@ if __name__ == '__main__':
     _settings_file_ = 'settings.xml'
 
     _streamer_code_ = '#! /bin/bash\n' + \
-        'source=$*\n' + \
-        'stream=$(grep -A 1 "${source}$" ' + _profile_+_playlist_src_ + ' | head -n 2 | tail -n 1)\n' + \
-        'ffmpeg -re -fflags +genpts -loglevel fatal -i ${stream} -probesize 32 -c copy -f mpegts -mpegts_service_type digital_tv pipe:1\n'
+                      'source=$*\n' + \
+                      'stream=$(grep -A 1 "${source}$" ' + _profile_ + _playlist_src_ + ' | head -n 2 | tail -n 1)\n' + \
+                      'ffmpeg -re -fflags +genpts -loglevel fatal -i ${stream} -probesize 32 -c copy -f mpegts -mpegts_service_type digital_tv pipe:1\n'
+
 
     def getSetting(setting):
         return _addon_.getSetting(setting).strip().decode('utf-8')
 
+
     def getSettingBool(setting):
         return getSetting(setting).lower() == "true"
+
 
     def getSettingInt(setting, default):
         try:
@@ -98,13 +94,16 @@ if __name__ == '__main__':
         except ValueError:
             return default
 
+
     def setSetting(setting, value):
         _addon_.setSetting(setting, str(value))
+
 
     def _toFile(content, name):
         file = open(xbmc.translatePath(os.path.join(_addon_.getAddonInfo('profile'), name)), 'w')
         file.write(content)
         file.close()
+
 
     def _testFile(name):
         try:
@@ -115,14 +114,17 @@ if __name__ == '__main__':
             file.close()
             return True
 
+
     def _tryExec(name):
         file = xbmc.translatePath(os.path.join(_addon_.getAddonInfo('profile'), name))
         sts = os.stat(file)
         if not (sts.st_mode & stat.S_IEXEC): os.chmod(file, sts.st_mode | stat.S_IEXEC)
 
+
     def _timeChange(name):
         file = xbmc.translatePath(os.path.join(_addon_.getAddonInfo('profile'), name))
         return os.stat(file).st_mtime
+
 
     def loadSettings(save=False):
         global _username_
@@ -192,6 +194,7 @@ if __name__ == '__main__':
         global _next_test_
         _next_test_ = getSetting('next_test')
 
+
     def testSettings():
         _username_ = getSetting('username')
         _password_ = getSetting('password')
@@ -201,26 +204,33 @@ if __name__ == '__main__':
         param_error = (_playlist_type_ == 0) or (_playlist_type_ > 3)
         return login_error, start_error, param_error
 
+
     def _deviceId():
         mac = get_mac()
-        hexed = hex((mac*7919)%(2**64))
-        return ('0000000000000000'+hexed[2:-1])[16:]
+        hexed = hex((mac * 7919) % (2 ** 64))
+        return ('0000000000000000' + hexed[2:-1])[16:]
+
 
     def _randomHex16():
         return ''.join([random.choice('0123456789abcdef') for x in range(16)])
 
+
     def idle():
         return execute('Dialog.Close(busydialog)')
+
 
     def openSettings():
         execute('Addon.OpenSettings(%s)' % _id_, True)
 
+
     def idle():
         return execute('Dialog.Close(busydialog)')
+
 
     def yesnoDialog(line1, line2, line3, heading=_name_, nolabel='', yeslabel=''):
         idle()
         return dialog.yesno(heading, line1, line2, line3, nolabel, yeslabel)
+
 
     def notification(message, icon=_icon_, time=5000):
         if icon == 'INFO':
@@ -230,6 +240,7 @@ if __name__ == '__main__':
         elif icon == 'ERROR':
             icon = xbmcgui.NOTIFICATION_ERROR
         xbmc.executebuiltin("XBMC.Notification(%s,%s,%i,%s)" % (_name_, message.decode('utf-8'), time, icon))
+
 
     def infoDialog(message, icon=_icon_, time=5000, sound=False):
         if icon == '':
@@ -242,29 +253,36 @@ if __name__ == '__main__':
             icon = xbmcgui.NOTIFICATION_ERROR
         dialog.notification(_name_, message, icon, time, sound=sound)
 
+
     def log(msg, level=xbmc.LOGDEBUG):
-        if type(msg).__name__=='unicode':
+        if type(msg).__name__ == 'unicode':
             msg = msg.encode('utf-8')
-        xbmc.log("[%s] %s"%(_name_,msg.__str__()), level)
+        xbmc.log("[%s] %s" % (_name_, msg.__str__()), level)
+
 
     def logNot(msg):
-        log(msg,level=xbmc.LOGNOTICE)
+        log(msg, level=xbmc.LOGNOTICE)
+
 
     def logWrn(msg):
-        log(msg,level=xbmc.LOGWARNING)
+        log(msg, level=xbmc.LOGWARNING)
+
 
     def logDbg(msg):
-        log(msg,level=xbmc.LOGDEBUG)
+        log(msg, level=xbmc.LOGDEBUG)
+
 
     def logErr(msg):
-        log(msg,level=xbmc.LOGERROR)
+        log(msg, level=xbmc.LOGERROR)
+
 
     def _toString(text):
-        if type(text).__name__=='unicode':
+        if type(text).__name__ == 'unicode':
             output = text.encode('utf-8')
         else:
             output = str(text)
         return output
+
 
     urllib3.disable_warnings()
 
@@ -274,9 +292,9 @@ if __name__ == '__main__':
     login_error, start_error, param_error = testSettings()
     while login_error or start_error or param_error:
         line1 = 'Neúplné nastavení parametrů služby'
-        line2 = 'Nastavte parametry pro:%s%s%s' % (' Přihlášení' if login_error else ''\
-                                                   , ' Spouštění' if start_error else ''\
-                                                   , ' Playlist' if param_error else '')
+        line2 = 'Nastavte parametry pro:%s%s%s' % (' Přihlášení' if login_error else '' \
+                                                       , ' Spouštění' if start_error else '' \
+                                                       , ' Playlist' if param_error else '')
         line3 = 'Spustit nastavení parametrů služby?'
         if yesnoDialog(line1, line2, line3):
             openSettings()
@@ -310,6 +328,7 @@ try:
 
     _o2tvgo_ = O2TVGO(_device_id_, _username_, _password_, _quality_)
 
+
     def _fetchChannels():
         global _o2tvgo_
         channels = None
@@ -323,7 +342,8 @@ try:
             except NoPurchasedServiceError:
                 return None, _nopurch_error_
         return channels, _no_error_
-        
+
+
     def _reload_settings():
         _addon_.openSettings()
         global _username_
@@ -339,6 +359,7 @@ try:
         global _o2tvgo_
         _o2tvgo_ = O2TVGO(_device_id_, _username_, _password_, _quality_)
 
+
     def _logoName(channel):
         channel = unicode(channel, 'utf-8')
         channel = unicodedata.normalize('NFKD', channel)
@@ -348,6 +369,7 @@ try:
             if not unicodedata.combining(char) and (char.isalpha() or char.isdigit()):
                 name += char
         return name
+
 
     def _logoFile(channel):
         if _channel_logoname_ == 0:
@@ -362,6 +384,7 @@ try:
             return ''
         return file
 
+
     def _logoPathFile(channel):
         if _channel_logo_ == 2:
             path_file = _channel_logopath_ + _logoFile(channel)
@@ -373,11 +396,13 @@ try:
             return ''
         return path_file
 
-    def _addParam (param, value, cond):
-        item =''
+
+    def _addParam(param, value, cond):
+        item = ''
         if cond:
             item = ' %s="%s"' % (param, str(value))
         return item
+
 
     def channelPlaylist():
         channels, code = _fetchChannels()
@@ -435,12 +460,13 @@ try:
         setSetting('last_skipped', _toString(err))
         return _no_error_, num, err
 
+
     def nextTime():
         start_period = int(_start_period_hours_[int(_start_period_)])
         act_time_sec = time.time()
         act_date = time.strftime('%Y-%m-%d')
         act_start = ('%s %s:00' % (act_date, _start_hour_))
-        act_start_sec = time.mktime(time.strptime(act_start,'%Y-%m-%d %H:%M'))
+        act_start_sec = time.mktime(time.strptime(act_start, '%Y-%m-%d %H:%M'))
         offset_raw = (act_time_sec - act_start_sec) / (start_period * 3600)
         offset = int(offset_raw)
         if offset_raw >= 0:
@@ -448,11 +474,14 @@ try:
         offset *= start_period
         next_time_sec = act_start_sec + offset * 3600
         next_time = time.strftime('%Y-%m-%d %H:%M', time.localtime(next_time_sec))
-        logDbg('nextTime result: %s %d %d %s %f %f' % (act_start, act_start_sec, next_time_sec, next_time, offset_raw, offset))
+        logDbg('nextTime result: %s %d %d %s %f %f' % (
+        act_start, act_start_sec, next_time_sec, next_time, offset_raw, offset))
         return next_time, next_time_sec
 
+
     def toMaster(master):
-        return int(time.mktime(time.strptime(time.strftime('%Y-%m-%d %H:%M'),'%Y-%m-%d %H:%M')) + master - time.time())
+        return int(time.mktime(time.strptime(time.strftime('%Y-%m-%d %H:%M'), '%Y-%m-%d %H:%M')) + master - time.time())
+
 
     logNot('Waiting %s s for Service' % (_start_delay_))
     xbmc.sleep(_start_delay_ * 1000)
@@ -481,7 +510,7 @@ try:
                 continue
             master_delay = _master_delay_ - _cycle_step_
             logDbg('Service running: full cycle - time: %s' % (time.strftime('%Y-%m-%d %H:%M:%S')))
-            
+
             time_change_sec = _timeChange(_settings_file_)
             if time_change_sec != time_change_saved_sec:
                 time_change_saved_sec = time_change_sec
@@ -502,8 +531,10 @@ try:
                 if not error_report:
                     error_report = True
                     infoDialog(_lang_(30048))
-                    logWrn('Unfinished settings - login : %s, start : %s, param : %s' % (_toString(login_error), _toString(start_error), _toString(param_error)))
-                logDbg('Service running: short cycle (Unfinished settings) - time: %s' % (time.strftime('%Y-%m-%d %H:%M:%S')))
+                    logWrn('Unfinished settings - login : %s, start : %s, param : %s' % (
+                    _toString(login_error), _toString(start_error), _toString(param_error)))
+                logDbg('Service running: short cycle (Unfinished settings) - time: %s' % (
+                    time.strftime('%Y-%m-%d %H:%M:%S')))
                 continue
 
             if error_report:
@@ -542,17 +573,19 @@ try:
             if next_time != _next_time_:
                 setSetting('next_time', _toString(next_time))
             infoDialog(_lang_(30047) % (next_time))
-           
+
         except Exception as ex:
             infoDialog(_lang_(30042))
             exc_type, exc_value, exc_traceback = sys.exc_info()
-            logErr('LOOP error - exc_type:%s, exc_value:%s, exc_traceback:%s' % (_toString(exc_type), _toString(exc_value), _toString(exc_traceback)))
+            logErr('LOOP error - exc_type:%s, exc_value:%s, exc_traceback:%s' % (
+            _toString(exc_type), _toString(exc_value), _toString(exc_traceback)))
 
     infoDialog(_lang_(30043))
     logNot('DONE Service')
 except:
     infoDialog(_lang_(30042))
     exc_type, exc_value, exc_traceback = sys.exc_info()
-    logErr('INIT error - exc_type:%s, exc_value:%s, exc_traceback:%s' % (_toString(exc_type), _toString(exc_value), _toString(exc_traceback)))
+    logErr('INIT error - exc_type:%s, exc_value:%s, exc_traceback:%s' % (
+    _toString(exc_type), _toString(exc_value), _toString(exc_traceback)))
     infoDialog(_lang_(30043))
     logNot('DONE Service')

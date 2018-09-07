@@ -8,24 +8,19 @@ Script je odvozen z Kodi addon service.playlist.o2tv,
 který byl vytvořen z původního addon autora Štěpána Orta.
 '''
 
-import sys
 import os
-import urllib
-import httplib
-import json
-import traceback
 import random
 import stat
-import unicodedata
 import time
-import urllib3
-from urlparse import urlparse
+import unicodedata
 from uuid import getnode as get_mac
-from o2tvgo import O2TVGO
+
+import urllib3
 from o2tvgo import AuthenticationError
-from o2tvgo import TooManyDevicesError
 from o2tvgo import ChannelIsNotBroadcastingError
 from o2tvgo import NoPurchasedServiceError
+from o2tvgo import O2TVGO
+from o2tvgo import TooManyDevicesError
 
 _version_ = '0.0.3'
 _date_ = '2018-05-29'
@@ -124,9 +119,9 @@ _channel_logogithub_ = 0
 ###########################################################################################################
 
 _streamer_code_ = '#! /bin/bash\n' + \
-    'source=$*\n' + \
-    'stream=$(grep -A 1 "${source}$" ' + _playlist_path_ + _playlist_src_ + ' | head -n 2 | tail -n 1)\n' + \
-    _command_ffmpeg_ + ' -re -fflags +genpts -loglevel fatal -i ${stream} -probesize 32 -c copy -f mpegts -mpegts_service_type digital_tv pipe:1\n'
+                  'source=$*\n' + \
+                  'stream=$(grep -A 1 "${source}$" ' + _playlist_path_ + _playlist_src_ + ' | head -n 2 | tail -n 1)\n' + \
+                  _command_ffmpeg_ + ' -re -fflags +genpts -loglevel fatal -i ${stream} -probesize 32 -c copy -f mpegts -mpegts_service_type digital_tv pipe:1\n'
 
 _pipe_ = 'pipe://'
 _default_groupname_ = "O2TV"
@@ -140,6 +135,7 @@ _toomany_error_ = 'TooManyDevicesError'
 _nopurch_error_ = 'NoPurchasedServiceError'
 
 urllib3.disable_warnings()
+
 
 def _cutLog(limit, reduction):
     try:
@@ -163,21 +159,24 @@ def _cutLog(limit, reduction):
             file.write(new_lines)
             file.close()
         return
-        
+
+
 def _toLog(message):
     file = open(_log_file_, 'a')
     file.write('%s %s\n' % (time.strftime('%Y-%m-%d %H:%M:%S'), message))
     file.close()
+
 
 def _toFile(content, name):
     file = open(name, 'w')
     file.write(content)
     file.close()
 
+
 def _getId(name):
     try:
         id = ''
-        file = open(name,'r')
+        file = open(name, 'r')
         lines = file.readlines()
     except IOError as ex:
         return id
@@ -186,14 +185,17 @@ def _getId(name):
         file.close()
         return id
 
+
 def _deviceId():
     mac = get_mac()
-    hexed = hex((mac*7919)%(2**64))
-    return ('0000000000000000'+hexed[2:-1])[16:]
+    hexed = hex((mac * 7919) % (2 ** 64))
+    return ('0000000000000000' + hexed[2:-1])[16:]
+
 
 def _randomHex16():
     return ''.join([random.choice('0123456789abcdef') for x in range(16)])
-    
+
+
 _cutLog(_log_limit_, _log_reduction_)
 _toLog('Start')
 _toLog('Version: %s' % (_version_))
@@ -209,8 +211,9 @@ if not (device_id or _device_id_):
     _toLog('New Device Id: %s' % (_device_id_))
 else:
     if device_id:
-        _device_id_ = device_id  
+        _device_id_ = device_id
 _toFile(_device_id_, _id_file_)
+
 
 def _tryFile(name):
     try:
@@ -221,11 +224,13 @@ def _tryFile(name):
         file.close()
         return True
 
+
 def _tryExec(name):
     file = name
     sts = os.stat(file)
     if not (sts.st_mode & stat.S_IEXEC):
         os.chmod(file, sts.st_mode | stat.S_IEXEC)
+
 
 def _fetchChannels():
     global _o2tvgo_
@@ -241,12 +246,14 @@ def _fetchChannels():
             return None, _nopurch_error_
     return channels, 'OK'
 
+
 def _toString(text):
-    if type(text).__name__=='unicode':
+    if type(text).__name__ == 'unicode':
         output = text.encode('utf-8')
     else:
         output = str(text)
     return output
+
 
 def _logoName(channel):
     channel = unicode(channel, 'utf-8')
@@ -257,6 +264,7 @@ def _logoName(channel):
         if not unicodedata.combining(char) and (char.isalpha() or char.isdigit()):
             name += char
     return name
+
 
 def _logoFile(channel):
     if _channel_logoname_ == 0:
@@ -271,6 +279,7 @@ def _logoFile(channel):
         return ''
     return file
 
+
 def _logoPathFile(channel):
     if _channel_logo_ == 2:
         path_file = _channel_logopath_ + _logoFile(channel)
@@ -282,11 +291,13 @@ def _logoPathFile(channel):
         return ''
     return path_file
 
-def _addParam (param, value, cond):
-    item =''
+
+def _addParam(param, value, cond):
+    item = ''
     if cond:
         item = ' %s="%s"' % (param, str(value))
     return item
+
 
 def channelPlaylist():
     channels, code = _fetchChannels()
@@ -340,6 +351,7 @@ def channelPlaylist():
     _toFile(playlist_src, _playlist_path_ + _playlist_src_)
     _toFile(playlist_dst, _playlist_path_ + _playlist_dst_)
     return 'OK', num, err
+
 
 if _stream_quality_ == 1:
     _quality_ = 'STB'

@@ -4,9 +4,6 @@
 """Wrapper pro O2TV Go
 """
 
-import httplib
-import urllib
-import json
 import requests
 
 __author__ = "Štěpán Ort"
@@ -14,23 +11,27 @@ __license__ = "MIT"
 __version__ = "1.1.7"
 __email__ = "stepanort@gmail.com"
 
-_COMMON_HEADERS = { "X-Nangu-App-Version" : "Android#1.2.9",
-                    "X-Nangu-Device-Name" : "Nexus 7",
-                    "User-Agent" : "Dalvik/2.1.0 (Linux; U; Android 5.1.1; Nexus 7 Build/LMY47V)",
-                    "Accept-Encoding": "gzip",
-                    "Connection" : "Keep-Alive" }
+_COMMON_HEADERS = {"X-Nangu-App-Version": "Android#1.2.9",
+                   "X-Nangu-Device-Name": "Nexus 7",
+                   "User-Agent": "Dalvik/2.1.0 (Linux; U; Android 5.1.1; Nexus 7 Build/LMY47V)",
+                   "Accept-Encoding": "gzip",
+                   "Connection": "Keep-Alive"}
+
 
 def _toString(text):
-    if type(text).__name__=='unicode':
+    if type(text).__name__ == 'unicode':
         output = text.encode('utf-8')
     else:
         output = str(text)
     return output
 
 # Kanál
+
+
 class LiveChannel:
 
-    def __init__(self, o2tv, channel_key, name, logo_url, weight, quality): # JiRo - doplněn parametr kvality
+    # JiRo - doplněn parametr kvality
+    def __init__(self, o2tv, channel_key, name, logo_url, weight, quality):
         self._o2tv = o2tv
         self.channel_key = channel_key
         self.name = name
@@ -47,14 +48,16 @@ class LiveChannel:
         subscription_code = self._o2tv.subscription_code
         playlist = None
         while access_token:
-            params = {"serviceType":"LIVE_TV",
-              "subscriptionCode":subscription_code,
-              "channelKey": self.channel_key,
-              "deviceType":self.quality,
-              "streamingProtocol":"HLS"} # JiRo - doplněn parametr kvality
+            params = {"serviceType": "LIVE_TV",
+                      "subscriptionCode": subscription_code,
+                      "channelKey": self.channel_key,
+                      "deviceType": self.quality,
+                      "streamingProtocol": "HLS"}  # JiRo - doplněn parametr kvality
             headers = _COMMON_HEADERS
-            cookies = { "access_token": access_token, "deviceId": self._o2tv.device_id }
-            req = requests.get('http://app.o2tv.cz/sws/server/streaming/uris.json', params=params, headers=headers, cookies=cookies)
+            cookies = {"access_token": access_token,
+                       "deviceId": self._o2tv.device_id}
+            req = requests.get('http://app.o2tv.cz/sws/server/streaming/uris.json',
+                               params=params, headers=headers, cookies=cookies)
             jsonData = req.json()
             access_token = None
             if 'statusMessage' in jsonData:
@@ -69,21 +72,27 @@ class LiveChannel:
                 playlist = jsonData["uris"][0]["uri"]
         return playlist
 
+
 class ChannelIsNotBroadcastingError(BaseException):
     pass
+
 
 class AuthenticationError(BaseException):
     pass
 
+
 class TooManyDevicesError(BaseException):
     pass
 
-class NoPurchasedServiceError(BaseException): # JiRo - doplněna kontrola zaplacené služby
+
+# JiRo - doplněna kontrola zaplacené služby
+class NoPurchasedServiceError(BaseException):
     pass
+
 
 class O2TVGO:
 
-    def __init__(self, device_id, username, password, quality): # JiRo - doplněn parametr kvality
+    def __init__(self, device_id, username, password, quality):  # JiRo - doplněn parametr kvality
         self.username = username
         self.password = password
         self._live_channels = {}
@@ -99,14 +108,15 @@ class O2TVGO:
             raise AuthenticationError()
         headers = _COMMON_HEADERS
         headers["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8"
-        data = {  'grant_type' : 'password',
-                  'client_id' : 'tef-web-portal-etnetera',
-                  'client_secret' : '2b16ac9984cd60dd0154f779ef200679',
-                  'username' : self.username,
-                  'password' : self.password,
-                  'platform_id' : '231a7d6678d00c65f6f3b2aaa699a0d0',
-                  'language' : 'cs'}
-        req = requests.post('https://oauth.o2tv.cz/oauth/token', data=data, headers=headers, verify=False)
+        data = {'grant_type': 'password',
+                'client_id': 'tef-web-portal-etnetera',
+                'client_secret': '2b16ac9984cd60dd0154f779ef200679',
+                'username': self.username,
+                'password': self.password,
+                'platform_id': '231a7d6678d00c65f6f3b2aaa699a0d0',
+                'language': 'cs'}
+        req = requests.post('https://oauth.o2tv.cz/oauth/token',
+                            data=data, headers=headers, verify=False)
         j = req.json()
         if 'error' in j:
             error = j['error']
@@ -123,13 +133,15 @@ class O2TVGO:
             self.refresh_access_token()
         access_token = self.access_token
         headers = _COMMON_HEADERS
-        cookies = { "access_token": access_token, "deviceId": self.device_id }
-        req = requests.get('http://app.o2tv.cz/sws/subscription/settings/subscription-configuration.json', headers=headers, cookies=cookies)
+        cookies = {"access_token": access_token, "deviceId": self.device_id}
+        req = requests.get(
+            'http://app.o2tv.cz/sws/subscription/settings/subscription-configuration.json', headers=headers, cookies=cookies)
         j = req.json()
         if 'errorMessage' in j:
             errorMessage = j['errorMessage']
             statusMessage = j['statusMessage']
-            if statusMessage == 'devices-limit-exceeded': # JiRo - změna z 'unauthorized-device' na 'devices-limit-exceeded'
+            # JiRo - změna z 'unauthorized-device' na 'devices-limit-exceeded'
+            if statusMessage == 'devices-limit-exceeded':
                 raise TooManyDevicesError()
             else:
                 raise Exception(errorMessage)
@@ -154,19 +166,21 @@ class O2TVGO:
         quality = self.quality  # JiRo - doplněn parametr kvality
         if len(self._live_channels) == 0:
             headers = _COMMON_HEADERS
-            cookies = { "access_token": access_token, "deviceId": self.device_id }
-            params = { "locality": locality,
-                "tariff": tariff,
-                "isp": "1",
-                "language": "ces",
-                "deviceType": quality,
-                "liveTvStreamingProtocol":"HLS",
-                "offer": offer}  # doplněn parametr kvality
-            req = requests.get('http://app.o2tv.cz/sws/server/tv/channels.json', params=params, headers=headers, cookies=cookies)
+            cookies = {"access_token": access_token,
+                       "deviceId": self.device_id}
+            params = {"locality": locality,
+                      "tariff": tariff,
+                      "isp": "1",
+                      "language": "ces",
+                      "deviceType": quality,
+                      "liveTvStreamingProtocol": "HLS",
+                      "offer": offer}  # doplněn parametr kvality
+            req = requests.get('http://app.o2tv.cz/sws/server/tv/channels.json',
+                               params=params, headers=headers, cookies=cookies)
             j = req.json()
             purchased_channels = j['purchasedChannels']
-            if len(purchased_channels) == 0: # JiRo - doplněna kontrola zaplacené služby 
-                raise NoPurchasedServiceError() # JiRo - doplněna kontrola zaplacené služby
+            if len(purchased_channels) == 0:  # JiRo - doplněna kontrola zaplacené služby
+                raise NoPurchasedServiceError()  # JiRo - doplněna kontrola zaplacené služby
             items = j['channels']
             for channel_id, item in items.iteritems():
                 if channel_id in purchased_channels:
@@ -176,17 +190,19 @@ class O2TVGO:
                         logo = 'http://app.o2tv.cz' + _toString(item['logo'])
                         name = _toString(item['channelName'])
                         weight = item['weight']
-                        self._live_channels[channel_key] = LiveChannel(self, channel_key, name, logo, weight, quality) # doplněn parametr kvality
+                        self._live_channels[channel_key] = LiveChannel(
+                            self, channel_key, name, logo, weight, quality)  # doplněn parametr kvality
             done = False
             offset = 0
             while not done:
                 headers = _COMMON_HEADERS
-                params = { "language": "ces",
-                    "audience": "over_18",
-                    "channelKey": self._live_channels.keys(),
-                    "limit": 30,
-                    "offset": offset}
-                req = requests.get('http://www.o2tv.cz/mobile/tv/channels.json', params=params, headers=headers)
+                params = {"language": "ces",
+                          "audience": "over_18",
+                          "channelKey": self._live_channels.keys(),
+                          "limit": 30,
+                          "offset": offset}
+                req = requests.get(
+                    'http://www.o2tv.cz/mobile/tv/channels.json', params=params, headers=headers)
                 j = req.json()
                 items = j['channels']['items']
                 for item in items:
