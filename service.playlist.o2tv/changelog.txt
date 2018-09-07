@@ -1,0 +1,10 @@
+2018-05-11 [0.0.3]
+ * Added three sets of parameters - Startup Parameters, Playlist Parameters, Startup state
+2018-05-10 [0.0.2]
+ * Fixed error at channel without program [ChannelIsNotBroadcastingError]
+ * Several types of log messages and notifications added 
+ * Start of language files editing
+ * New logo
+2018-05-08 [0.0.1]
+ * Initial release - very raw, less then alpha
+ * Derived from the original plugin version 1.1.8
