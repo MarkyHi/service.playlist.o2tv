@@ -8,7 +8,7 @@ import requests
 
 __author__ = "Štěpán Ort"
 __license__ = "MIT"
-__version__ = "1.1.7"
+__version__ = "1.1.8"
 __email__ = "stepanort@gmail.com"
 
 _COMMON_HEADERS = {"X-Nangu-App-Version": "Android#1.2.9",
@@ -24,6 +24,7 @@ def _toString(text):
     else:
         output = str(text)
     return output
+
 
 # Kanál
 
@@ -69,7 +70,21 @@ class LiveChannel:
                 else:
                     raise Exception(status)
             else:
-                playlist = jsonData["uris"][0]["uri"]
+                # Pavuucek: Pokus o vynucení HD kvality
+                playlist = ""
+                # pro kvalitu STB nebo PC se pokusíme vybrat HD adresu.
+                # když není k dispozici, tak první v seznamu
+                for uris in jsonData["uris"]:
+                    if self.quality == "STB" or self.quality == "PC":
+                        if uris["resolution"] == "HD" and playlist == "":
+                            playlist = uris["uri"]
+                    else:
+                        # pro ostatní vracíme SD adresu
+                        if uris["resolution"] == "SD" and playlist == "":
+                            playlist = uris["uri"]
+                # playlist nebyl přiřazený, takže první adresa v seznamu
+                if playlist == "":
+                    playlist = jsonData["uris"][0]["uri"]
         return playlist
 
 
@@ -135,7 +150,8 @@ class O2TVGO:
         headers = _COMMON_HEADERS
         cookies = {"access_token": access_token, "deviceId": self.device_id}
         req = requests.get(
-            'http://app.o2tv.cz/sws/subscription/settings/subscription-configuration.json', headers=headers, cookies=cookies)
+            'http://app.o2tv.cz/sws/subscription/settings/subscription-configuration.json', headers=headers,
+            cookies=cookies)
         j = req.json()
         if 'errorMessage' in j:
             errorMessage = j['errorMessage']
