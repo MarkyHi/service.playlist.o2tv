@@ -9,24 +9,31 @@ který byl vytvořen z původního addon autora Štěpána Orta.
 *********************************************************
 '''
 
-import os
-import random
-import stat
 import sys
-import time
-import unicodedata
-from uuid import getnode as get_mac
-
+import os
 import xbmc
-import xbmcaddon
 import xbmcgui
-
-import urllib3
+import xbmcplugin
+import xbmcaddon
+import urllib
+import httplib
+from urlparse import urlparse
+import json
+import traceback
+import random
+from uuid import getnode as get_mac
+from o2tvgo import O2TVGO
 from o2tvgo import AuthenticationError
+from o2tvgo import TooManyDevicesError
 from o2tvgo import ChannelIsNotBroadcastingError
 from o2tvgo import NoPurchasedServiceError
-from o2tvgo import O2TVGO
-from o2tvgo import TooManyDevicesError
+import xbmcvfs
+import time
+import _strptime
+import string
+import unicodedata
+import stat
+import urllib3
 
 params = False
 
