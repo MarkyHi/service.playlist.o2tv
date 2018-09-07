@@ -387,7 +387,9 @@ try:
 
     def _logoPathFile(channel):
         if _channel_logo_ == 2:
-            path_file = _channel_logopath_ + _logoFile(channel)
+            path_file = os.path.join(_channel_logopath_,_logoFile(channel))
+            if not os.path.isfile(path_file):
+                path_file = ""
         elif _channel_logo_ == 3:
             path_file = _channel_logourl_ + _logoFile(channel)
         elif _channel_logo_ == 4:
@@ -423,12 +425,17 @@ try:
         err = 0
         for channel in channels_sorted:
             try:
+                logNot("Adding: " + channel.name)
                 name = channel.name
                 logo = _toString(channel.logo_url)
                 url = _toString(channel.url())
                 epgname = name
                 epgid = name
-                if _channel_logo_ > 1:
+                # číslo programu v epg
+                # viz https://www.o2.cz/file_conver/174210/_025_J411544_Razeni_televiznich_programu_O2_TV_03_2018.pdf
+                channel_weight = _toString(channel.weight)
+                # logo v mistnim souboru - kdyz soubor neexistuje, tak pouzit url
+                if (_channel_logo_ > 1) and (_logoPathFile(name) != ""):
                     logo = _logoPathFile(name)
                 playlist_src += '#EXTINF:-1, %s\n%s\n' % (name, url)
                 if _playlist_type_ == 1:
@@ -436,18 +443,21 @@ try:
                     playlist_dst += _addParam('tvg-name', epgname, _channel_epgname_ != 0)
                     playlist_dst += _addParam('tvg-id', epgid, _channel_epgid_ != 0)
                     playlist_dst += _addParam('tvg-logo', logo, _channel_logo_ != 0)
+                    playlist_dst += _addParam('tvg-chno', channel_weight, _channel_epgid_ != 0)
                     playlist_dst += _addParam('group-titles', group, _channel_group_ != 0)
                     playlist_dst += ', %s\n%s\n' % (name, url)
                 if (_playlist_type_ == 2) or (_playlist_type_ == 3):
                     playlist_dst += '#EXTINF:-1'
                     playlist_dst += _addParam('tvg-id', epgid, _channel_epgid_ != 0)
                     playlist_dst += _addParam('tvg-logo', logo, _channel_logo_ != 0)
+                    playlist_dst += _addParam('tvg-chno', channel_weight, _channel_epgid_ != 0)
                     playlist_dst += _addParam('group-titles', group, _channel_group_ != 0)
                     playlist_dst += ', %s\n' % (name)
-                    if _playlist_type_ == 2: playlist_dst += '%s\n' % (url)
+                    if _playlist_type_ == 2: playlist_dst += '%s\n' % url
                     if _playlist_type_ == 3: playlist_dst += '%s %s\n' % (streamer, name)
                 num += 1
             except ChannelIsNotBroadcastingError:
+                logNot("... Not broadcasting. Skipped.")
                 err += 1
             except AuthenticationError:
                 return _authent_error_, 0, 0
