@@ -83,10 +83,11 @@ if __name__ == '__main__':
 
     _streamer_code_ = '#! /bin/bash\n' + \
                       'source=$*\n' + \
-                      'stream=$(grep -A 1 "${source}$" ' + _profile_ + _playlist_src_ + ' | head -n 2 | tail -n 1)\n' + \
-                      'ffmpeg -re -fflags +genpts -loglevel fatal -i ${stream} -probesize 32 -c copy -f mpegts -mpegts_service_type digital_tv pipe:1\n'
-
-
+                      'stream=$(grep -A 1 "${source}$" ' + os.path.join(_profile_, _playlist_src_) + ' | head -n 2 | tail -n 1)\n' + \
+                      'streamcount=$(wget -qO - ${stream} | grep -Eo "(http|https)://[\da-z./?A-Z0-9\D=_-]*" | wc -l)\n' + \
+                      'streamcount=$((streamcount-1))\n' + \
+                      'ffmpeg -re -fflags +genpts -loglevel fatal -i ${stream} -probesize 32 -c copy -map p:${streamcount}?' + \
+                      '-f mpegts -mpegts_service_type digital_tv pipe:1'
     def getSetting(setting):
         return _addon_.getSetting(setting).strip().decode('utf-8')
 
