@@ -71,9 +71,9 @@ def _cutLog(limit, reduction):
 
 def _toLog(message):
     file = open(_log_file_, 'a')
-    message = format('%s %s\n' % (time.strftime('%Y-%m-%d %H:%M:%S'), message))
+    message = format('%s %s' % (time.strftime('%Y-%m-%d %H:%M:%S'), message))
     print(message)
-    file.write(message)
+    file.write(message + "\n")
     file.close()
 
 
@@ -251,7 +251,7 @@ def channelPlaylist():
                 playlist_dst += _addParam('tvg-name', epgname, cfg._channel_epgname_ != 0)
                 playlist_dst += _addParam('tvg-id', epgid, cfg._channel_epgid_ != 0)
                 playlist_dst += _addParam('tvg-logo', logo, cfg._channel_logo_ != 0)
-                playlist_dst += _addParam('tvg-chno', channel_weight, _channel_epgid_ != 0)
+                playlist_dst += _addParam('tvg-chno', channel_weight, cfg._channel_epgid_ != 0)
                 playlist_dst += _addParam('group-titles', group, cfg._channel_group_ != 0)
                 playlist_dst += ', %s\n%s\n' % (name, url)
             if (cfg._playlist_type_ == 2) or (cfg._playlist_type_ == 3):
