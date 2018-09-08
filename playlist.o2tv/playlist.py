@@ -28,11 +28,17 @@ _date_ = '2018-05-29'
 
 _streamer_code_ = '#! /bin/bash\n' + \
                   'source=$*\n' + \
-                  'stream=$(grep -A 1 "${source}$" ' + os.path.join(cfg._playlist_path_, cfg._playlist_src_) + ' | head -n 2 | tail -n 1)\n' + \
-                  'streamcount=$(wget -qO - ${stream} | grep -Eo "(http|https)://[\da-z./?A-Z0-9\D=_-]*" | wc -l)\n' + \
+                  'tempplaylist=$(mktemp -u)".m3u8"\n' + \
+                  'stream=$(grep -A 1 "${source}$" ' + os.path.join(cfg._playlist_path_, cfg._playlist_src_) + \
+                  ' | head -n 2 | tail -n 1)\n' + \
+                  'wget -qO ${tempplaylist} ${stream}\n' + \
+                  'streamcount=$(cat ${tempplaylist} | grep -Eo "(http|https)://[\da-z./?A-Z0-9\D=_-]*" | wc -l)\n' + \
                   'streamcount=$((streamcount-1))\n' + \
-                  cfg._command_ffmpeg_ + ' -re -fflags +genpts -loglevel fatal -i ${stream} -probesize 32 -c copy -map p:${streamcount}?' + \
-                  '-f mpegts -mpegts_service_type digital_tv pipe:1'
+                  'if  [ "$streamcount" = "-1" ]; then streamcount=0; fi\n' + \
+                  cfg._command_ffmpeg_ + ' -protocol_whitelist file,http,https,tcp,tls -fflags +genpts '+ \
+                  '-loglevel fatal -i ${tempplaylist} -probesize 32 -reconnect_at_eof 1 -reconnect_streamed 1 ' + \
+                  '-c copy -map p:${streamcount}? -f mpegts -tune zerolatency -bsf:v h264_mp4toannexb,dump_extra ' + \
+                  '-mpegts_service_type digital_tv pipe:1\n'
 
 _pipe_ = 'pipe://'
 _default_groupname_ = "O2TV"
