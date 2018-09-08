@@ -203,7 +203,9 @@ class O2TVGO:
                     live = item['liveTvPlayable']
                     if live:
                         channel_key = _toString(item['channelKey'])
-                        logo = 'http://app.o2tv.cz' + _toString(item['logo'])
+                        logo = _toString(item['logo'])
+                        if not logo.startswith('http://'):
+                            logo = 'http://app.o2tv.cz' + logo
                         name = _toString(item['channelName'])
                         weight = item['weight']
                         self._live_channels[channel_key] = LiveChannel(
