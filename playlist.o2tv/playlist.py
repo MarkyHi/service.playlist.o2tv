@@ -23,8 +23,8 @@ from o2tvgo import NoPurchasedServiceError
 from o2tvgo import O2TVGO
 from o2tvgo import TooManyDevicesError
 
-_version_ = '0.0.3'
-_date_ = '2018-05-29'
+_version_ = '0.0.4'
+_date_ = '2018-09-09'
 
 _streamer_code_ = '#! /bin/bash\n' + \
                   'source=$*\n' + \
