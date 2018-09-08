@@ -19,7 +19,7 @@
 	<string id="30043">STOP aplikace</string>
 	<string id="30044">Bude spuštěno stažení playlistu pro službu O2TV</string>
 	<string id="30045">Chcete skutečně pokračovat?</string>
-	<string id="30046">V této verzi není povoleno rucni spusteni</string>
+	<string id="30046">V této verzi není povoleno ruční spuštění</string>
 	<string id="30047">Příští stažení %s</string>
 	<string id="30048">Neúplné nastavení - playlist nebude stahován!</string>
 	<string id="30049">START aplikace</string>
@@ -31,7 +31,7 @@
 	<string id="30104">Základní čas spuštění [hodina dne]</string>
 	<string id="30105">Perioda spouštění [hodin]</string>
 	<string id="30106">Spuštění po startu</string>
-	<string id="30107">Prodleva spuštění po startu Kodi [sec]</string>
+	<string id="30107">Prodleva spuštění po startu Kodi [sek]</string>
 	<string id="30108">Limit pro vynechání následujícího spuštění [%]</string>
 	<string id="30109">Zastavení služby</string>
 	<string id="30110">Spuštění služby</string>
