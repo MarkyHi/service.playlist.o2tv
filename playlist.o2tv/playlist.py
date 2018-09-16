@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-'''
-Script pro generaci playlistu z OTA služby O2TV
-***********************************************
-Script je odvozen z Kodi addon service.playlist.o2tv,
-který byl vytvořen z původního addon autora Štěpána Orta.
-'''
 
-import config as cfg
+# Script pro generaci playlistu z OTA služby O2TV
+# ***********************************************
+# Script je odvozen z Kodi addon service.playlist.o2tv,
+# který byl vytvořen z původního addon autora Štěpána Orta.
+
+
 import os
 import random
 import stat
@@ -16,6 +15,7 @@ import time
 import unicodedata
 from uuid import getnode as get_mac
 
+import config as cfg
 import urllib3
 from o2tvgo import AuthenticationError
 from o2tvgo import ChannelIsNotBroadcastingError
@@ -119,7 +119,7 @@ def _random_hex16():
 _cut_log(_log_limit_, _log_reduction_)
 _log("--------------------")
 _log('O2TVKodi Playlist')
-_log('Version: %s' % _version_)
+_log('Version: %s %s' % (_version_, _date_))
 _log("--------------------")
 _log("Starting...")
 device_id = _get_id(_id_file_)

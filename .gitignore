@@ -1,3 +1,11 @@
+config.py
+streamer.sh
+streamer.sh.sample
+device_id
+o2tv.generic.m3u8
+o2tv.playlist.m3u8
+
+.idea
 
 # Created by https://www.gitignore.io/api/python
 
