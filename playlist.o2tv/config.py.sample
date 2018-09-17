@@ -1,1 +1,95 @@
-#!/usr/bin/env python# -*- coding: utf-8 -*-############################################################################################################ Základní parametry############################################################################################################ Přihlašovací jméno a heslo:username = ''password = ''# ID zařízení:device_id = ''# Adresář pro vytvářené soubory a případného vlastního skriptu:# Pozor! Je třeba zadat absolutní cestu!playlist_path = ''# Jméno souboru stahovaného playlistuplaylist_src = 'o2tv.generic.m3u8'# Jméno souboru vytvářeného playlistuplaylist_dst = 'o2tv.playlist.m3u8'# Jméno souboru skriptu streameruplaylist_streamer = 'streamer.sh'# Povel pro spuštění ffmpegffmpeg_command = 'ffmpeg'# Použití streameru# 0 - bude použit vygenerovaný skript se jménem uloženým v _playlist_streamer_# 1 - bude použit vlastní script se zadaným jménem. Skript musí být umístěn v cestě uložené v _playlist_path_!my_script = 0# Jméno souboru vlastního skriptu streameru - jméno nesmí být shodné se jménem uloženým v _playlist_streamer_!my_script_name = 'myscript.sh'# Kvalita streamu# 0 - pro nižsí kvalitu, zpravidla (maximálně) 1280x720# 1 - pro vyšší kvalitu, zpravidla 1920x1080stream_quality = 1####################################################################################################################################################################################################################### Parametry vytvářeného playlistu############################################################################################################ Typ playlistu# 1 - pro IPTV Simple Client# 2 - pro Tvheadend# 3 - pro Tvheadend@playlist_type = 3# Parametry v řádku EXTINF# Parametr tvg_name - používá se pro Typ playlistu = 1# 0 - nepoužije se# 1 - přebírá se ze jména kanáluchannel_epg_name = 0# Parametr tvg_id - používá se pro Typ playlistu = 1, 2, 3# 0 - nepoužije se# 1 - přebírá se ze jména kanáluchannel_epg_id = 0# Parametr group-titles - používá se pro Typ playlistu = 1, 2, 3# 0 - nepoužije se# 1 - Použije se text: O2TV# 2 - použije se text z proměnné _channel_groupname_channel_group = 0channel_group_name = ''# Parametr tvg_logo - používá se pro Typ playlistu = 1, 2, 3# Typ loga, případně cesta pro umístění souborů slogem# 0 - nepoužije se# 1 - přebírá se ze zdroje# 2 - místní umístění, pro cestu se použije obsah proměnné _channel_logopath_# 3 - internetové umístění, pro url se použije obsah proměnné _channel_logourl_# 4 - logo od @marhycz na Githubchannel_logo = 1channel_logo_path = ''channel_logo_url = ''# Konvence jména souboru - používá se pro Typ loga = 2 a 3# 0 - nazevsouboru.png# 1 - nazevsouboru.jpg# 2 - Název souboru.png# 3 - Název souboru.jpgchannel_logo_name = 0# Kvalita @marhycz loga - používá se pro Typ loga = 4# 0 - 640x640# 1 - 1024x1024channel_logo_github = 0####################################################################################################################################################################################################################### Samples of messages in playlist.log############################################################################################################ RRRR-MM-DD HH:MM:SS Download done with result EXIT:AuthenticationError , DOWNLOADED:-1, SKIPPED:-1# - přihlášení k účtu neproběhlo korektně, zkontrolujte _username_ a _password_# - hodnoty -1 u stažených/přeskočených kanálů znamenají, že se stahování vůbec nespustilo# RRRR-MM-DD HH:MM:SS Download done with result EXIT:NoPurchasedServiceError , DOWNLOADED:-1, SKIPPED:-1# - seznam služeb vašeho účtu je prázdný# - pravděpodobně nemáte zaplacenou vámi objednanou sližbu# RRRR-MM-DD HH:MM:SS Download done with result EXIT:TooManyDevicesError , DOWNLOADED:-1, SKIPPED:-1# - překročili jste limit 4 identifikovaných a registrovaných zařízení# - upravte počet registrovaných zařízení na https://www.o2tv.cz/sprava-zarizeni/# RRRR-MM-DD HH:MM:SS Download done with result EXIT:OK , DOWNLOADED:11, SKIPPED:0# - generace playlist proběhla v pořádku# - SKIPPED je počet kanálů, pro které v době stažení playlist nebyl k dispozici žádný stream###########################################################################################################
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+###########################################################################################################
+# Základní parametry
+###########################################################################################################
+# Přihlašovací jméno a heslo:
+username = ''
+password = ''
+# ID zařízení:
+device_id = ''
+# Adresář pro vytvářené soubory a případného vlastního skriptu:
+# Pozor! Je třeba zadat absolutní cestu!
+playlist_path = ''
+# Jméno souboru stahovaného playlistu
+playlist_src = 'o2tv.generic.m3u8'
+# Jméno souboru vytvářeného playlistu
+playlist_dst = 'o2tv.playlist.m3u8'
+# Jméno souboru skriptu streameru
+playlist_streamer = 'streamer.sh'
+# Povel pro spuštění ffmpeg
+ffmpeg_command = 'ffmpeg'
+# Použití streameru
+# 0 - bude použit vygenerovaný skript se jménem uloženým v _playlist_streamer_
+# 1 - bude použit vlastní script se zadaným jménem. Skript musí být umístěn v cestě uložené v _playlist_path_!
+my_script = 0
+# Jméno souboru vlastního skriptu streameru - jméno nesmí být shodné se jménem uloženým v _playlist_streamer_!
+my_script_name = 'myscript.sh'
+# Kvalita streamu
+# 0 - pro nižsí kvalitu, zpravidla (maximálně) 1280x720
+# 1 - pro vyšší kvalitu, zpravidla 1920x1080
+stream_quality = 1
+###########################################################################################################
+
+###########################################################################################################
+# Parametry vytvářeného playlistu
+###########################################################################################################
+# Typ playlistu
+# 1 - pro IPTV Simple Client
+# 2 - pro Tvheadend
+# 3 - pro Tvheadend@
+playlist_type = 3
+# Parametry v řádku EXTINF
+# Parametr tvg_name - používá se pro Typ playlistu = 1
+# 0 - nepoužije se
+# 1 - přebírá se ze jména kanálu
+channel_epg_name = 1
+# Parametr tvg_id - používá se pro Typ playlistu = 1, 2, 3
+# 0 - nepoužije se
+# 1 - přebírá se ze jména kanálu
+channel_epg_id = 1
+# Parametr group-titles - používá se pro Typ playlistu = 1, 2, 3
+# 0 - nepoužije se
+# 1 - Použije se text: O2TV
+# 2 - použije se text z proměnné _channel_groupname_
+channel_group = 1
+channel_group_name = 'O2TV'
+# Parametr tvg_logo - používá se pro Typ playlistu = 1, 2, 3
+# Typ loga, případně cesta pro umístění souborů slogem
+# 0 - nepoužije se
+# 1 - přebírá se ze zdroje
+# 2 - místní umístění, pro cestu se použije obsah proměnné _channel_logopath_
+# 3 - internetové umístění, pro url se použije obsah proměnné _channel_logourl_
+# 4 - logo od @marhycz na Github
+channel_logo = 1
+channel_logo_path = ''
+channel_logo_url = ''
+# Konvence jména souboru - používá se pro Typ loga = 2 a 3
+# 0 - nazevsouboru.png
+# 1 - nazevsouboru.jpg
+# 2 - Název souboru.png
+# 3 - Název souboru.jpg
+channel_logo_name = 0
+# Kvalita @marhycz loga - používá se pro Typ loga = 4
+# 0 - 640x640
+# 1 - 1024x1024
+channel_logo_github = 0
+###########################################################################################################
+
+###########################################################################################################
+# Samples of messages in playlist.log
+###########################################################################################################
+# RRRR-MM-DD HH:MM:SS Download done with result EXIT:AuthenticationError , DOWNLOADED:-1, SKIPPED:-1
+# - přihlášení k účtu neproběhlo korektně, zkontrolujte _username_ a _password_
+# - hodnoty -1 u stažených/přeskočených kanálů znamenají, že se stahování vůbec nespustilo
+# RRRR-MM-DD HH:MM:SS Download done with result EXIT:NoPurchasedServiceError , DOWNLOADED:-1, SKIPPED:-1
+# - seznam služeb vašeho účtu je prázdný
+# - pravděpodobně nemáte zaplacenou vámi objednanou sližbu
+# RRRR-MM-DD HH:MM:SS Download done with result EXIT:TooManyDevicesError , DOWNLOADED:-1, SKIPPED:-1
+# - překročili jste limit 4 identifikovaných a registrovaných zařízení
+# - upravte počet registrovaných zařízení na https://www.o2tv.cz/sprava-zarizeni/
+# RRRR-MM-DD HH:MM:SS Download done with result EXIT:OK , DOWNLOADED:11, SKIPPED:0
+# - generace playlist proběhla v pořádku
+# - SKIPPED je počet kanálů, pro které v době stažení playlist nebyl k dispozici žádný stream
+###########################################################################################################

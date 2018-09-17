@@ -43,10 +43,10 @@ _streamer_code_ = '#! /bin/bash\n' + \
 _pipe_ = 'pipe://'
 _default_groupname_ = "O2TV"
 _marhy_ = 'https://marhycz.github.io/picons/640/', 'https://marhycz.github.io/picons/1024/'
-_log_file_ = cfg.playlist_path + 'playlist.log'
+_log_file_ = os.path.join(cfg.playlist_path, 'playlist.log')
 _log_limit_ = 100
 _log_reduction_ = 50
-_id_file_ = cfg.playlist_path + 'device_id'
+_id_file_ = os.path.join(cfg.playlist_path, 'device_id')
 _authent_error_ = 'AuthenticationError'
 _toomany_error_ = 'TooManyDevicesError'
 _nopurch_error_ = 'NoPurchasedServiceError'
@@ -223,9 +223,9 @@ def channel_playlist():
     else:
         group = cfg.channel_group_name
     if cfg.my_script == 1:
-        streamer = _pipe_ + cfg.playlist_path + cfg.my_script_name
+        streamer = _pipe_ + os.path.join(cfg.playlist_path, cfg.my_script_name)
     else:
-        streamer = _pipe_ + cfg.playlist_path + cfg.playlist_streamer
+        streamer = _pipe_ + os.path.join(cfg.playlist_path, cfg.playlist_streamer)
     playlist_src = '#EXTM3U\n'
     playlist_dst = '#EXTM3U\n'
     _num = 0
@@ -272,8 +272,8 @@ def channel_playlist():
             return _authent_error_, 0, 0
         except TooManyDevicesError:
             return _toomany_error_, 0, 0
-    _to_file(playlist_src, cfg.playlist_path + cfg.playlist_src)
-    _to_file(playlist_dst, cfg.playlist_path + cfg.playlist_dst)
+    _to_file(playlist_src, os.path.join(cfg.playlist_path, cfg.playlist_src))
+    _to_file(playlist_dst, os.path.join(cfg.playlist_path, cfg.playlist_dst))
     return 'OK', _num, _err
 
 
@@ -285,10 +285,10 @@ else:
 _o2tvgo_ = O2TVGO(cfg.device_id, cfg.username, cfg.password, _quality_)
 
 if cfg.playlist_type == 3:
-    _to_file(_streamer_code_, cfg.playlist_path + cfg.playlist_streamer + '.sample')
-    _try_exec(cfg.playlist_path + cfg.playlist_streamer + '.sample')
-    _to_file(_streamer_code_, cfg.playlist_path + cfg.playlist_streamer)
-    _try_exec(cfg.playlist_path + cfg.playlist_streamer)
+    _to_file(_streamer_code_, os.path.join(cfg.playlist_path, cfg.playlist_streamer + '.sample'))
+    _try_exec(os.path.join(cfg.playlist_path, cfg.playlist_streamer + '.sample'))
+    _to_file(_streamer_code_, os.path.join(cfg.playlist_path, cfg.playlist_streamer))
+    _try_exec(os.path.join(cfg.playlist_path, cfg.playlist_streamer))
 
 code, num, err = channel_playlist()
 

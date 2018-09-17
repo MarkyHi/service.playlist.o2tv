@@ -434,9 +434,9 @@ try:
         else:
             group = _channel_groupname_
         if _myscript_ == 1:
-            streamer = _pipe_ + _playlist_path_ + _myscript_name_
+            streamer = _pipe_ + os.path.join(_playlist_path_, _myscript_name_)
         else:
-            streamer = _pipe_ + _playlist_path_ + _playlist_streamer_
+            streamer = _pipe_ + os.path.join(_playlist_path_, _playlist_streamer_)
         playlist_src = '#EXTM3U\n'
         playlist_dst = '#EXTM3U\n'
         _num = 0
