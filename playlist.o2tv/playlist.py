@@ -283,6 +283,7 @@ else:
     _quality_ = 'TABLET'
 
 _o2tvgo_ = O2TVGO(cfg.device_id, cfg.username, cfg.password, _quality_)
+_o2tvgo_.log_function = _log;
 
 if cfg.playlist_type == 3:
     _to_file(_streamer_code_, os.path.join(cfg.playlist_path, cfg.playlist_streamer + '.sample'))
