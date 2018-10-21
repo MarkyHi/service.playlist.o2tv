@@ -86,8 +86,8 @@
 
 	<string id="30400">Další nastavení</string>
 	<string id="30401">Kvalita streamů</string>
-	<string id="30402">Nízká</string>
-	<string id="30403">Vysoká</string>
+	<string id="30402">Nízká (SD)</string>
+	<string id="30403">Vysoká (HD)</string>
 	<string id="30410">Vytvořit seznam přeskočených kanálů</string>
 
 	<string id="30500">Nastala chyba při běhu aplikace.</string>

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<strings>
+    <string id="30000">Login</string>
+    <string id="30001">Username</string>
+    <string id="30002">Password</string>
+    <string id="30003">Invalid login</string>
+    <string id="30004">Device name</string>
+    <string id="30005">Device ID</string>
+    <string id="30006">Too many devices paired with this account</string>
+    <string id="30007">Channel is not broadcasting</string>
+    <string id="30008">Service is was not paid</string>
+    <string id="30009">OK</string>
+
+    <string id="30025">Report errors</string>
+
+    <string id="30040">Downloading playlist</string>
+    <string id="30041">%d/%d channels downloaded/skipped</string>
+    <string id="30042">Addon error, please check the log file</string>
+    <string id="30043">Addon STOP</string>
+    <string id="30044">O2TV playlist download will be started</string>
+    <string id="30045">Do you want to proceed?</string>
+    <string id="30046">Manual downloading is not enabled in this version</string>
+    <string id="30047">Next download on %s</string>
+    <string id="30048">Incomplete settings - playlist will not download!</string>
+    <string id="30049">Addon START</string>
+
+    <string id="30100">Starting</string>
+    <string id="30101">Enable manual download</string>
+    <string id="30102">Run download</string>
+    <string id="30103">Enable automatic download</string>
+    <string id="30104">First run time [hour]</string>
+    <string id="30105">Periodic run [hours]</string>
+    <string id="30106">Run on startup</string>
+    <string id="30107">Startup run delay [sec]</string>
+    <string id="30108">Limit pro vynechání následujícího spuštění [%]</string>
+    <string id="30109">Stop service</string>
+    <string id="30110">Start service</string>
+
+    <string id="30200">Playlist</string>
+    <string id="30201">Playlist type</string>
+    <string id="30202">NONE</string>
+    <string id="30203">IPTV Simple Client</string>
+    <string id="30204">TVHeadend</string>
+    <string id="30205">TVHeadend@</string>
+    <string id="30210">Channel name in EPG [tvg_name]</string>
+    <string id="30211">NONE</string>
+    <string id="30212">Take from channel name</string>
+    <string id="30213">Channel name [m3u_name]</string>
+    <string id="30214">NONE</string>
+    <string id="30215">Take from source</string>
+    <string id="30220">Channel number [tvh_chnum]</string>
+    <string id="30221">NONE</string>
+    <string id="30222">Take from source (pořadí)</string>
+    <string id="30223">Ascending</string>
+    <string id="30224">Ascending from starting number</string>
+    <string id="30230">Starting number</string>
+    <string id="30240">Channel group [group-title]</string>
+    <string id="30241">NONE</string>
+    <string id="30243">Input group name</string>
+    <string id="30250">Group name</string>
+    <string id="30260">Channel logo [tvg-logo]</string>
+    <string id="30261">NONE</string>
+    <string id="30262">Take from source</string>
+    <string id="30263">Local path</string>
+    <string id="30264">Internet url</string>
+    <string id="30265">Logos from @marhycz on Github</string>
+    <string id="30270">Path</string>
+    <string id="30271">URL</string>
+    <string id="30272">Quality</string>
+    <string id="30273">640x640</string>
+    <string id="30275">1024x1024</string>
+    <string id="30280">File name format</string>
+    <string id="30281">channelname.png</string>
+    <string id="30282">channelname.jpg</string>
+    <string id="30283">Channel Name.png</string>
+    <string id="30284">Channel Name.jpg</string>
+    <string id="30290">Channel EPG ID [tvg-id]</string>
+    <string id="30291">NONE</string>
+    <string id="30292">Take from channel name</string>
+    <string id="30300">EPG channel name [tvh-epg]</string>
+    <string id="30301">NONE</string>
+    <string id="30302">Off</string>
+    <string id="30303">On</string>
+    <string id="30310">Use custom streamer script</string>
+    <string id="30311">Script name</string>
+
+    <string id="30400">More settings</string>
+    <string id="30401">Stream Quality</string>
+    <string id="30402">Low (SD)</string>
+    <string id="30403">High (HD)</string>
+    <string id="30410">Create skipped channel list</string>
+
+    <string id="30500">Error ocurred during runtime.</string>
+    <string id="30501">Allow reporting of errors?</string>
+    <string id="30502">Error was sent to be repaired</string>
+    <string id="30503">Failure report could not be sent</string>
+
+    <string id="30700">Statistics</string>
+    <string id="30701">Start time</string>
+    <string id="30702">Last download time</string>
+    <string id="30703">Channels downloaded</string>
+    <string id="30704">Skipped channels</string>
+    <string id="30705">Next download time</string>
+
+    <string id="30800">Service settings are incomplete</string>
+    <string id="30801">Please set parameters for: %s %s %s</string>
+    <string id="30802">Login</string>
+    <string id="30803">Startup</string>
+    <string id="30804">Playlist</string>
+    <string id="30805">Open service parameters setup?</string>
+
+</strings>
