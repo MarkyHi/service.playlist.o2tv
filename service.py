@@ -15,13 +15,6 @@ import xbmc
 import xbmcgui
 import xbmcplugin
 import xbmcaddon
-import urllib
-import httplib
-from urlparse import urlparse
-import json
-import traceback
-import random
-from uuid import getnode as get_mac
 from o2tvgo import O2TVGO
 from o2tvgo import AuthenticationError
 from o2tvgo import TooManyDevicesError
@@ -29,9 +22,6 @@ from o2tvgo import ChannelIsNotBroadcastingError
 from o2tvgo import NoPurchasedServiceError
 import xbmcvfs
 import time
-import _strptime
-import string
-import unicodedata
 import stat
 import urllib3
 import common as c
@@ -373,13 +363,6 @@ try:
         return path_file
 
 
-    def _add_param(param, value, cond):
-        item = ''
-        if cond:
-            item = ' %s="%s"' % (param, str(value))
-        return item
-
-
     def channel_playlist():
         channels, _code = _fetch_channels()
         if not channels:
@@ -414,18 +397,18 @@ try:
                 playlist_src += '#EXTINF:-1, %s\n%s\n' % (name, url)
                 if _playlist_type_ == 1:
                     playlist_dst += '#EXTINF:-1'
-                    playlist_dst += _add_param('tvg-name', epgname, _channel_epgname_ != 0)
-                    playlist_dst += _add_param('tvg-id', epgid, _channel_epgid_ != 0)
-                    playlist_dst += _add_param('tvg-logo', logo, _channel_logo_ != 0)
-                    playlist_dst += _add_param('tvg-chno', channel_weight, _channel_epgid_ != 0)
-                    playlist_dst += _add_param('group-titles', group, _channel_group_ != 0)
+                    playlist_dst += c.add_param('tvg-name', epgname, _channel_epgname_ != 0)
+                    playlist_dst += c.add_param('tvg-id', epgid, _channel_epgid_ != 0)
+                    playlist_dst += c.add_param('tvg-logo', logo, _channel_logo_ != 0)
+                    playlist_dst += c.add_param('tvg-chno', channel_weight, _channel_epgid_ != 0)
+                    playlist_dst += c.add_param('group-titles', group, _channel_group_ != 0)
                     playlist_dst += ', %s\n%s\n' % (name, url)
                 if (_playlist_type_ == 2) or (_playlist_type_ == 3):
                     playlist_dst += '#EXTINF:-1'
-                    playlist_dst += _add_param('tvg-id', epgid, _channel_epgid_ != 0)
-                    playlist_dst += _add_param('tvg-logo', logo, _channel_logo_ != 0)
-                    playlist_dst += _add_param('tvg-chno', channel_weight, _channel_epgid_ != 0)
-                    playlist_dst += _add_param('group-titles', group, _channel_group_ != 0)
+                    playlist_dst += c.add_param('tvg-id', epgid, _channel_epgid_ != 0)
+                    playlist_dst += c.add_param('tvg-logo', logo, _channel_logo_ != 0)
+                    playlist_dst += c.add_param('tvg-chno', channel_weight, _channel_epgid_ != 0)
+                    playlist_dst += c.add_param('group-titles', group, _channel_group_ != 0)
                     playlist_dst += ', %s\n' % name
                     if _playlist_type_ == 2:
                         playlist_dst += '%s\n' % url

@@ -12,10 +12,10 @@ import os
 import stat
 import time
 
-
-import config as cfg
 import urllib3
+
 import common as c
+import config as cfg
 from o2tvgo import AuthenticationError
 from o2tvgo import ChannelIsNotBroadcastingError
 from o2tvgo import NoPurchasedServiceError
@@ -120,6 +120,7 @@ def _fetch_channels():
             return None, c.nopurch_error
     return channels, 'OK'
 
+
 def _logo_file(channel):
     if cfg.channel_logo_name == 0:
         f = c.logo_name(channel) + '.png'
@@ -146,13 +147,6 @@ def _logo_path_file(channel):
     else:
         return ''
     return path_file
-
-
-def _add_param(param, value, cond):
-    item = ''
-    if cond:
-        item = ' %s="%s"' % (param, str(value))
-    return item
 
 
 def channel_playlist():
@@ -189,18 +183,18 @@ def channel_playlist():
             playlist_src += '#EXTINF:-1, %s\n%s\n' % (name, url)
             if cfg.playlist_type == 1:
                 playlist_dst += '#EXTINF:-1'
-                playlist_dst += _add_param('tvg-name', epgname, cfg.channel_epg_name != 0)
-                playlist_dst += _add_param('tvg-id', epgid, cfg.channel_epg_id != 0)
-                playlist_dst += _add_param('tvg-logo', logo, cfg.channel_logo != 0)
-                playlist_dst += _add_param('tvg-chno', channel_weight, cfg.channel_epg_id != 0)
-                playlist_dst += _add_param('group-titles', group, cfg.channel_group != 0)
+                playlist_dst += c.add_param('tvg-name', epgname, cfg.channel_epg_name != 0)
+                playlist_dst += c.add_param('tvg-id', epgid, cfg.channel_epg_id != 0)
+                playlist_dst += c.add_param('tvg-logo', logo, cfg.channel_logo != 0)
+                playlist_dst += c.add_param('tvg-chno', channel_weight, cfg.channel_epg_id != 0)
+                playlist_dst += c.add_param('group-titles', group, cfg.channel_group != 0)
                 playlist_dst += ', %s\n%s\n' % (name, url)
             if (cfg.playlist_type == 2) or (cfg.playlist_type == 3):
                 playlist_dst += '#EXTINF:-1'
-                playlist_dst += _add_param('tvg-id', epgid, cfg.channel_epg_id != 0)
-                playlist_dst += _add_param('tvg-logo', logo, cfg.channel_logo != 0)
-                playlist_dst += _add_param('tvg-chno', channel_weight, cfg.channel_epg_id != 0)
-                playlist_dst += _add_param('group-titles', group, cfg.channel_group != 0)
+                playlist_dst += c.add_param('tvg-id', epgid, cfg.channel_epg_id != 0)
+                playlist_dst += c.add_param('tvg-logo', logo, cfg.channel_logo != 0)
+                playlist_dst += c.add_param('tvg-chno', channel_weight, cfg.channel_epg_id != 0)
+                playlist_dst += c.add_param('group-titles', group, cfg.channel_group != 0)
                 playlist_dst += ', %s\n' % name
                 if cfg.playlist_type == 2:
                     playlist_dst += '%s\n' % url
