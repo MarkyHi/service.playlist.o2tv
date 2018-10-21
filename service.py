@@ -300,8 +300,7 @@ try:
     else:
         _quality_ = _quality_high_
 
-    _o2tvgo_ = O2TVGO(_device_id_, _username_, _password_, _quality_)
-    _o2tvgo_.log_function = _log_dbg
+    _o2tvgo_ = O2TVGO(_device_id_, _username_, _password_, _quality_, _log_dbg)
 
 
     def _fetch_channels():

@@ -26,7 +26,8 @@ urllib3.disable_warnings()
 
 
 def _cut_log(limit, reduction):
-    if cfg.cut_log == 0: return
+    if cfg.cut_log == 0:
+        return
     try:
         f = open(c.log_file, 'r')
         lines = f.readlines()
@@ -229,8 +230,7 @@ if cfg.stream_quality == 1:
 else:
     _quality_ = 'TABLET'
 
-_o2tvgo_ = O2TVGO(cfg.device_id, cfg.username, cfg.password, _quality_)
-_o2tvgo_.log_function = _log
+_o2tvgo_ = O2TVGO(cfg.device_id, cfg.username, cfg.password, _quality_, _log)
 
 if cfg.playlist_type == 3:
     _to_file(c.streamer_code, os.path.join(cfg.playlist_path, cfg.playlist_streamer + '.sample'))
