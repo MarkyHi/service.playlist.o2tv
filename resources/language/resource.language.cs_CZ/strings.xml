@@ -56,7 +56,6 @@
 	<string id="30230">Počáteční číslo</string>
 	<string id="30240">Skupina kanálu [group-title]</string>
 	<string id="30241">ŽÁDNÁ</string>
-	<string id="30242">O2TV</string>
 	<string id="30243">Zadané jméno skupiny</string>
 	<string id="30250">Jméno skupiny</string>
 	<string id="30260">Logo kanálu [tvg-logo]</string>
@@ -69,9 +68,7 @@
 	<string id="30271">URL</string>
 	<string id="30272">Kvalita</string>
 	<string id="30273">640x640</string>
-	<string id="30274">https://marhycz.github.io/picons/640/</string>
 	<string id="30275">1024x1024</string>
-	<string id="30276">https://marhycz.github.io/picons/1024/</string>
 	<string id="30280">Konvence jména souboru</string>
 	<string id="30281">nazevkanalu.png</string>
 	<string id="30282">nazevkanalu.jpg</string>

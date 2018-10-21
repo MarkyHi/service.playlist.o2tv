@@ -75,6 +75,13 @@ channel_logo_name = 0
 # 0 - 640x640
 # 1 - 1024x1024
 channel_logo_github = 0
+# Orezavani log souboru
+# 0 - neorezavat, nechat log bobtnat do obrich rozmeru :-)
+# 1 - orezavat podle nasledujicich nastaveni
+cut_log = 1
+
+log_limit = 100
+log_reduction = 50
 ###########################################################################################################
 
 ###########################################################################################################

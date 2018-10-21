@@ -34,6 +34,7 @@ import string
 import unicodedata
 import stat
 import urllib3
+import common as c
 
 params = False
 
@@ -61,7 +62,6 @@ if __name__ == '__main__':
     ERROR = 'ERROR'
 
     _start_period_hours_ = 1, 2, 3, 4, 6, 8, 12, 24
-    _marhy_ = _lang_(30274), _lang_(30276)
     _no_error_ = 0
     _authent_error_ = 1
     _toomany_error_ = 2
@@ -69,7 +69,6 @@ if __name__ == '__main__':
     _error_code_ = 0, 1, 2, 3
     _error_str_ = 'OK', 'AuthenticationError', 'TooManyDevicesError', 'NoPurchasedServiceError'
     _error_lang_ = 'OK', _lang_(30003), _lang_(30006), _lang_(30008)
-    _default_groupname_ = _lang_(30242)
     _quality_high_ = 'STB'
     _quality_low_ = 'TABLET'
     _cycle_step_ = 5
@@ -78,21 +77,7 @@ if __name__ == '__main__':
     _playlist_src_ = 'o2tv.generic.m3u8'
     _playlist_dst_ = 'o2tv.playlist.m3u8'
     _playlist_streamer_ = 'streamer.sh'
-    _pipe_ = 'pipe://'
     _settings_file_ = 'settings.xml'
-
-    _streamer_code_ = '#! /bin/bash\n' + \
-                      'source=$*\n' + \
-                      'tempplaylist=$(mktemp -u)".m3u8"\n' + \
-                      'stream=$(grep -A 1 "${source}$" ' + _playlist_src_ + ' | head -n 2 | tail -n 1)\n' + \
-                      'wget -qO ${tempplaylist} ${stream}\n' + \
-                      'streamcount=$(cat ${tempplaylist} | grep -Eo "(http|https)://[\da-z./?A-Z0-9\D=_-]*" | wc -l)\n' + \
-                      'streamcount=$((streamcount-1))\n' + \
-                      'if  [ "$streamcount" = "-1" ]; then streamcount=0; fi\n' + \
-                      'ffmpeg -protocol_whitelist file,http,https,tcp,tls -fflags +genpts -loglevel fatal' + \
-                      '-i ${tempplaylist} -probesize 32 -reconnect_at_eof 1 -reconnect_streamed 1 -c copy ' + \
-                      '-map p:${streamcount}? -f mpegts -tune zerolatency -bsf:v h264_mp4toannexb,dump_extra ' + \
-                      '-mpegts_service_type digital_tv pipe:1\n'
 
     def get_setting(setting):
         return _addon_.getSetting(setting).strip().decode('utf-8')
@@ -149,7 +134,7 @@ if __name__ == '__main__':
         global _device_id_
         _device_id_ = get_setting('device_id')
         global _access_token_
-        _access_token_ = get_setting('acces_token')
+        _access_token_ = get_setting('access_token')
 
         global _start_automatic_
         _start_automatic_ = get_setting_bool('start_automatic')
@@ -223,16 +208,6 @@ if __name__ == '__main__':
         return _login_error, _start_error, _param_error
 
 
-    def _device_id():
-        mac = get_mac()
-        hexed = hex((mac * 7919) % (2 ** 64))
-        return ('0000000000000000' + hexed[2:-1])[16:]
-
-
-    def _random_hex16():
-        return ''.join([random.choice('0123456789abcdef') for x in range(16)])
-
-
     def idle():
         return execute('Dialog.Close(busydialog)')
 
@@ -293,15 +268,6 @@ if __name__ == '__main__':
     def log_err(msg):
         log(msg, level=xbmc.LOGERROR)
 
-
-    def _to_string(text):
-        if type(text).__name__ == 'unicode':
-            output = text.encode('utf-8')
-        else:
-            output = str(text)
-        return output
-
-
     urllib3.disable_warnings()
 
     log_not('Preparation for Service')
@@ -325,17 +291,17 @@ if __name__ == '__main__':
     load_settings(True)
 
     if not _device_id_:
-        first_device_id = _device_id()
-        second_device_id = _device_id()
+        first_device_id = c.device_id()
+        second_device_id = c.device_id()
         if first_device_id == second_device_id:
             _device_id_ = first_device_id
         else:
-            _device_id_ = _random_hex16()
+            _device_id_ = c.random_hex16()
         set_setting("device_id", _device_id_)
 
-    _to_file(_streamer_code_, _playlist_streamer_)
+    _to_file(c.streamer_code, _playlist_streamer_)
     _try_exec(_playlist_streamer_)
-    _to_file(_streamer_code_, _playlist_streamer_ + '.sample')
+    _to_file(c.streamer_code, _playlist_streamer_ + '.sample')
     _try_exec(_playlist_streamer_ + '.sample')
 
 try:
@@ -379,22 +345,11 @@ try:
         _o2tvgo_ = O2TVGO(_device_id_, _username_, _password_, _quality_)
 
 
-    def _logo_name(channel):
-        channel = unicode(channel, 'utf-8')
-        channel = unicodedata.normalize('NFKD', channel)
-        channel = channel.lower()
-        name = ''
-        for char in channel:
-            if not unicodedata.combining(char) and (char.isalpha() or char.isdigit()):
-                name += char
-        return name
-
-
     def _logo_file(channel):
         if _channel_logoname_ == 0:
-            f = _logo_name(channel) + '.png'
+            f = c.logo_name(channel) + '.png'
         elif _channel_logoname_ == 1:
-            f = _logo_name(channel) + '.jpg'
+            f = c.logo_name(channel) + '.jpg'
         elif _channel_logoname_ == 2:
             f = channel + '.png'
         elif _channel_logoname_ == 3:
@@ -412,7 +367,7 @@ try:
         elif _channel_logo_ == 3:
             path_file = _channel_logourl_ + _logo_file(channel)
         elif _channel_logo_ == 4:
-            path_file = _marhy_[_channel_logogithub_] + _logo_name(channel) + '.png'
+            path_file = c.marhy[_channel_logogithub_] + c.logo_name(channel) + '.png'
         else:
             return ''
         return path_file
@@ -431,13 +386,13 @@ try:
             return _code, -1, -1
         channels_sorted = sorted(channels.values(), key=lambda _channel: _channel.weight)
         if _channel_group_ == 1:
-            group = _default_groupname_
+            group = c.default_group_name
         else:
             group = _channel_groupname_
         if _myscript_ == 1:
-            streamer = _pipe_ + os.path.join(_playlist_path_, _myscript_name_)
+            streamer = c.pipe + os.path.join(_playlist_path_, _myscript_name_)
         else:
-            streamer = _pipe_ + os.path.join(_playlist_path_, _playlist_streamer_)
+            streamer = c.pipe + os.path.join(_playlist_path_, _playlist_streamer_)
         playlist_src = '#EXTM3U\n'
         playlist_dst = '#EXTM3U\n'
         _num = 0
@@ -446,13 +401,13 @@ try:
             try:
                 log_not("Adding: " + channel.name)
                 name = channel.name
-                logo = _to_string(channel.logo_url)
-                url = _to_string(channel.url())
+                logo = c.to_string(channel.logo_url)
+                url = c.to_string(channel.url())
                 epgname = name
                 epgid = name
                 # číslo programu v epg
                 # viz https://www.o2.cz/file_conver/174210/_025_J411544_Razeni_televiznich_programu_O2_TV_03_2018.pdf
-                channel_weight = _to_string(channel.weight)
+                channel_weight = c.to_string(channel.weight)
                 # logo v mistnim souboru - kdyz soubor neexistuje, tak pouzit url
                 if (_channel_logo_ > 1) and (_logo_path_file(name) != ""):
                     logo = _logo_path_file(name)
@@ -487,8 +442,8 @@ try:
         _to_file(playlist_src, _playlist_src_)
         _to_file(playlist_dst, _playlist_dst_)
         set_setting('last_time', time.strftime('%Y-%m-%d %H:%M'))
-        set_setting('last_downloaded', _to_string(_num))
-        set_setting('last_skipped', _to_string(_err))
+        set_setting('last_downloaded', c.to_string(_num))
+        set_setting('last_skipped', c.to_string(_err))
         return _no_error_, _num, _err
 
 
@@ -563,7 +518,7 @@ try:
                     error_report = True
                     info_dialog(_lang_(30048))
                     _log_wrn('Unfinished settings - login : %s, start : %s, param : %s' % (
-                        _to_string(login_error), _to_string(start_error), _to_string(param_error)))
+                        c.to_string(login_error), c.to_string(start_error), c.to_string(param_error)))
                 _log_dbg('Service running: short cycle (Unfinished settings) - time: %s' % (
                     time.strftime('%Y-%m-%d %H:%M:%S')))
                 continue
@@ -602,14 +557,14 @@ try:
 
             next_time, next_time_sec = next_time_()
             if next_time != _next_time_:
-                set_setting('next_time', _to_string(next_time))
+                set_setting('next_time', c.to_string(next_time))
             info_dialog(_lang_(30047) % (next_time))
 
         except Exception as ex:
             info_dialog(_lang_(30042))
             exc_type, exc_value, exc_traceback = sys.exc_info()
             log_err('LOOP error - exc_type:%s, exc_value:%s, exc_traceback:%s' % (
-                _to_string(exc_type), _to_string(exc_value), _to_string(exc_traceback)))
+                c.to_string(exc_type), c.to_string(exc_value), c.to_string(exc_traceback)))
 
     info_dialog(_lang_(30043))
     log_not('DONE Service')
@@ -617,6 +572,6 @@ except:
     info_dialog(_lang_(30042))
     exc_type, exc_value, exc_traceback = sys.exc_info()
     log_err('INIT error - exc_type:%s, exc_value:%s, exc_traceback:%s' % (
-        _to_string(exc_type), _to_string(exc_value), _to_string(exc_traceback)))
+        c.to_string(exc_type), c.to_string(exc_value), c.to_string(exc_traceback)))
     info_dialog(_lang_(30043))
     log_not('DONE Service')
