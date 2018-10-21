@@ -78,25 +78,10 @@ def _get_id(name):
         return _id
 
 
-_cut_log(cfg.log_limit, cfg.log_reduction)
-_log("--------------------")
-_log('O2TVKodi Playlist')
-_log('Version: %s %s' % (c.version, c.date))
-_log("--------------------")
-_log("Starting...")
-device_id = _get_id(c.id_file)
-if not (device_id or cfg.device_id):
-    first_device_id = c.device_id()
-    second_device_id = c.device_id()
-    if first_device_id == second_device_id:
-        cfg.device_id = first_device_id
-    else:
-        _device_id_ = c.random_hex16()
-    _log('New Device Id: %s' % cfg.device_id)
-else:
-    if device_id:
-        cfg.device_id = device_id
-_to_file(cfg.device_id, c.id_file)
+def check_config():
+    if cfg.username == '' or cfg.password == '':
+        return False
+    return True
 
 
 def _try_exec(name):
@@ -213,13 +198,39 @@ def channel_playlist():
     return 'OK', _num, _err
 
 
+_cut_log(cfg.log_limit, cfg.log_reduction)
+_log("--------------------")
+_log('O2TVKodi Playlist')
+_log('Version: %s %s' % (c.version, c.date))
+_log("--------------------")
+_log("Starting...")
+
+if not check_config():
+    _log('Invalid username or password.')
+    _log('Please check config.py')
+    exit()
+_log('Config OK')
+device_id = _get_id(c.id_file)
+if not (device_id or cfg.device_id):
+    first_device_id = c.device_id()
+    second_device_id = c.device_id()
+    if first_device_id == second_device_id:
+        cfg.device_id = first_device_id
+    else:
+        _device_id_ = c.random_hex16()
+    _log('New Device Id: %s' % cfg.device_id)
+else:
+    if device_id:
+        cfg.device_id = device_id
+_to_file(cfg.device_id, c.id_file)
+
 if cfg.stream_quality == 1:
     _quality_ = 'STB'
 else:
     _quality_ = 'TABLET'
 
 _o2tvgo_ = O2TVGO(cfg.device_id, cfg.username, cfg.password, _quality_)
-_o2tvgo_.log_function = _log;
+_o2tvgo_.log_function = _log
 
 if cfg.playlist_type == 3:
     _to_file(c.streamer_code, os.path.join(cfg.playlist_path, cfg.playlist_streamer + '.sample'))
@@ -230,4 +241,4 @@ if cfg.playlist_type == 3:
 code, num, err = channel_playlist()
 
 _log('Download done with result EXIT: %s , DOWNLOADED: %d, SKIPPED: %d' % (code, num, err))
-_log('Finish')
+_log('Finished')
