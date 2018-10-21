@@ -1,15 +1,24 @@
-2018-09-09 [0.0.4]
+2018-10-21 [0.5]
+ * English translation
+ * Fixed login issues
+ * Merged Kodi service and playlist scripts
+ * Fixed logo urls
+
+2018-09-08 [0.0.4] (not available to public)
  * new streamer.sh script
  * properly respect quality setting
  * various other bugfixes
+
 2018-06-01 [0.0.3]
  * Change type of addon from video addon to service
  * Added three sets of parameters - Startup Parameters, Playlist Parameters, Startup state
+
 2018-05-10 [0.0.2]
  * Fixed error at channel without program [ChannelIsNotBroadcastingError]
  * Several types of log messages and notifications added 
  * Start of language files editing
  * New logo
+
 2018-05-08 [0.0.1]
  * Initial release - very raw, less then alpha
  * Derived from the original plugin version 1.1.8
