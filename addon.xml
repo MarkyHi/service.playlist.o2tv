@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="service.playlist.o2tv" name="Playlist O2TV" version="0.0.4" provider-name="JiRo, úprava addon Štěpána Orta">
+<addon id="service.playlist.o2tv" name="Playlist O2TV" version="0.5" provider-name="JiRo, úprava addon Štěpána Orta">
   <requires>
     <import addon="xbmc.python" version="2.1.0"/>
     <import addon="script.module.requests" version="2.7.0"/>
@@ -8,25 +8,35 @@
     <provides>service</provides>
   </extension>
   <extension point="xbmc.addon.metadata">
-	<news>
-        2018-09-09 [0.0.4]
-        * new streamer.sh script
-        * properly respect quality setting
-        * various other bugfixes
-        2018-06-01 [0.0.3]
-        * Change type of addon from video addon to service
-        * Added three sets of parameters - Startup Parameters, Playlist Parameters, Startup state
-        2018-05-10 [0.0.2]
-        * Fixed error at channel without program [ChannelIsNotBroadcastingError]
-        * Several types of log messages and notifications added
-        * Start of language files editing
-        * New logo
-        2018-05-08 [0.0.1]
-        * Initial release - very raw, less then alpha
-        * Derived from the original plugin version 1.1.8
-	</news>
+    <news>
+ 2018-10-21 [0.5]
+ * English translation
+ * Fixed login issues
+ * Merged Kodi service and playlist scripts
+ * Fixed logo urls
+
+2018-09-08 [0.0.4] (not available to public)
+ * new streamer.sh script
+ * properly respect quality setting
+ * various other bugfixes
+
+2018-06-01 [0.0.3]
+ * Change type of addon from video addon to service
+ * Added three sets of parameters - Startup Parameters, Playlist Parameters, Startup state
+
+2018-05-10 [0.0.2]
+ * Fixed error at channel without program [ChannelIsNotBroadcastingError]
+ * Several types of log messages and notifications added 
+ * Start of language files editing
+ * New logo
+
+2018-05-08 [0.0.1]
+ * Initial release - very raw, less then alpha
+ * Derived from the original plugin version 1.1.8
+
+    </news>
     <summary>Playlist O2TV</summary>
-	<description>Plugin to download of playlist from O2TV broadcasting service</description>
+    <description>Plugin to download of playlist from O2TV broadcasting service</description>
     <description lang="cs">Plugin pro stažení playlistu ze služby O2TV</description>
     <platform>all</platform>
   </extension>
