@@ -5,7 +5,7 @@ from uuid import getnode as get_mac
 
 import config as cfg
 
-version = '0.0.5'
+version = '0.5'
 date = '2018-10-21'
 
 streamer_code = '#! /bin/bash\n' + \

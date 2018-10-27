@@ -227,7 +227,7 @@ if __name__ == '__main__':
 
     def info_dialog(message, icon=_icon_, _time=5000, sound=False):
         if icon == '':
-            icon = icon = _addon_.getAddonInfo('icon')
+            icon = _addon_.getAddonInfo('icon')
         elif icon == 'INFO':
             icon = xbmcgui.NOTIFICATION_INFO
         elif icon == 'WARNING':
