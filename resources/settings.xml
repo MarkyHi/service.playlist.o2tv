@@ -32,6 +32,7 @@
 		<setting type="sep" visible="eq(-12,3)"/>
 	    <setting label="30310" id="myscript" type= "bool" default="false" visible="eq(-13,3)"/>
 	    <setting label="30311" id="myscript_name" type= "text" default="myscript.sh" visible="eq(-14,3)+eq(-1,true)" subsetting="true"/>
+		<setting label="30312" id="ffmpeg_path" type="text" default="ffmpeg" visible="eq(-15,3)"/>
 	</category>
 	<category label="30700">
 		<setting label="30701" id="last_start" type="text" enable="false"/>

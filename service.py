@@ -158,6 +158,8 @@ if __name__ == '__main__':
         _myscript_ = get_setting_bool('myscript')
         global _myscript_name_
         _myscript_name_ = get_setting('myscript_name')
+        global _ffmpeg_
+        _ffmpeg_ = get_setting('ffmpeg_path')
 
         global _last_downloaded_
         _last_downloaded_ = get_setting('last_downloaded')
@@ -275,7 +277,8 @@ if __name__ == '__main__':
         else:
             _device_id_ = c.random_hex16()
         set_setting("device_id", _device_id_)
-    c.write_streamer(xbmc.translatePath(os.path.join(_profile_, _playlist_streamer_)), _log_dbg)
+    c.write_streamer(xbmc.translatePath(os.path.join(_profile_, _playlist_streamer_)),
+                     xbmc.translatePath(os.path.join(_profile_, _playlist_src_)), _ffmpeg_, _log_dbg)
 
 try:
     if _stream_quality_ == 0:
@@ -407,7 +410,8 @@ try:
         c.write_file(playlist_src, xbmc.translatePath(os.path.join(_profile_, _playlist_src_)), _log_dbg)
         c.write_file(playlist_dst, xbmc.translatePath(os.path.join(_profile_, _playlist_dst_)), _log_dbg)
         if _playlist_type_ == 3:
-            c.write_streamer(xbmc.translatePath(os.path.join(_profile_, _playlist_streamer_)), _log_dbg)
+            c.write_streamer(xbmc.translatePath(os.path.join(_profile_, _playlist_streamer_)),
+                             xbmc.translatePath(os.path.join(_profile_, _playlist_src_)), _ffmpeg_, _log_dbg)
         set_setting('last_time', time.strftime('%Y-%m-%d %H:%M'))
         set_setting('last_downloaded', c.to_string(_num))
         set_setting('last_skipped', c.to_string(_err))

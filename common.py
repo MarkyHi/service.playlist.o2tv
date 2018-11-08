@@ -8,21 +8,6 @@ import config as cfg
 
 version = '0.5'
 date = '2018-10-21'
-
-streamer_code = '#! /bin/bash\n' + \
-                'source=$*\n' + \
-                'tempplaylist=$(mktemp -u)".m3u8"\n' + \
-                'stream=$(grep -A 1 "${source}$" ' + os.path.join(cfg.playlist_path, cfg.playlist_src) + \
-                ' | head -n 2 | tail -n 1)\n' + \
-                'wget -qO ${tempplaylist} ${stream}\n' + \
-                'streamcount=$(cat ${tempplaylist} | grep -Eo "(http|https)://[\da-z./?A-Z0-9\D=_-]*" | wc -l)\n' + \
-                'streamcount=$((streamcount-1))\n' + \
-                'if  [ "$streamcount" = "-1" ]; then streamcount=0; fi\n' + \
-                cfg.ffmpeg_command + ' -protocol_whitelist file,http,https,tcp,tls -fflags +genpts ' + \
-                '-loglevel fatal -i ${tempplaylist} -probesize 32 -reconnect_at_eof 1 -reconnect_streamed 1 ' + \
-                '-c copy -map p:${streamcount}? -f mpegts -tune zerolatency -bsf:v h264_mp4toannexb,dump_extra ' + \
-                '-mpegts_service_type digital_tv pipe:1\n'
-
 pipe = 'pipe://'
 default_group_name = "O2TV"
 marhy = 'https://marhycz.github.io/picons/640/', 'https://marhycz.github.io/picons/1024/'
@@ -87,11 +72,25 @@ def try_exec(name):
         pass
 
 
-def write_streamer(name, log=None):
+def write_streamer(streamer_file, playlist_file, ffmpeg_cmd, log=None):
+    streamer_code = '#! /bin/bash\n' + \
+                    'source=$*\n' + \
+                    'tempplaylist=$(mktemp -u)".m3u8"\n' + \
+                    'stream=$(grep -A 1 "${source}$" ' + playlist_file + \
+                    ' | head -n 2 | tail -n 1)\n' + \
+                    'wget -qO ${tempplaylist} ${stream}\n' + \
+                    'streamcount=$(cat ${tempplaylist} | grep -Eo "(http|https)://[\da-z./?A-Z0-9\D=_-]*" | wc -l)\n' + \
+                    'streamcount=$((streamcount-1))\n' + \
+                    'if  [ "$streamcount" = "-1" ]; then streamcount=0; fi\n' + \
+                    ffmpeg_cmd + ' -protocol_whitelist file,http,https,tcp,tls -fflags +genpts ' + \
+                    '-loglevel fatal -i ${tempplaylist} -probesize 32 -reconnect_at_eof 1 -reconnect_streamed 1 ' + \
+                    '-c copy -map p:${streamcount}? -f mpegts -tune zerolatency -bsf:v h264_mp4toannexb,dump_extra ' + \
+                    '-mpegts_service_type digital_tv pipe:1\n'
+
     if not log is None:
-        log('Saving Streamer: ' + name)
-    write_file(streamer_code, name + '.sample')
+        log('Saving Streamer: ' + streamer_file)
+    write_file(streamer_code, streamer_file + '.sample')
     # _to_file(c.streamer_code, os.path.join(cfg.playlist_path, cfg.playlist_streamer + '.sample'))
-    try_exec(name + '.sample')
-    write_file(streamer_code, name)
-    try_exec(name)
+    try_exec(streamer_file + '.sample')
+    write_file(streamer_code, streamer_file)
+    try_exec(streamer_file)

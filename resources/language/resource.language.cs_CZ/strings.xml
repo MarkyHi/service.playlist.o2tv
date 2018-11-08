@@ -83,6 +83,7 @@
 	<string id="30303">Zapnout</string>
 	<string id="30310">Pro streamer použít vlastní script</string>
 	<string id="30311">Jméno souboru scriptu</string>
+	<string id="30312">Plná cesta k FFMPEGu</string>
 
 	<string id="30400">Další nastavení</string>
 	<string id="30401">Kvalita streamů</string>

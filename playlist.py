@@ -217,7 +217,9 @@ else:
 _o2tvgo_ = O2TVGO(cfg.device_id, cfg.username, cfg.password, _quality_, _log)
 
 if cfg.playlist_type == 3:
-    c.write_streamer(os.path.join(cfg.playlist_path, cfg.playlist_streamer), _log)
+    c.write_streamer(os.path.join(cfg.playlist_path, cfg.playlist_streamer),
+                     os.path.join(cfg.playlist_path, cfg.playlist_src),
+                     cfg.ffmpeg_command, _log)
 
 code, num, err = channel_playlist()
 
