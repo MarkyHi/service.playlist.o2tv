@@ -88,15 +88,9 @@ if __name__ == '__main__':
         _addon_.setSetting(setting, str(value))
 
 
-    def _to_file(content, name):
-        f = open(xbmc.translatePath(os.path.join(_addon_.getAddonInfo('profile'), name)), 'w')
-        f.write(content)
-        f.close()
-
-
     def _test_file(name):
         try:
-            f = open(xbmc.translatePath(os.path.join(_addon_.getAddonInfo('profile'), name)), 'r')
+            f = open(xbmc.translatePath(os.path.join(_profile_, name)), 'r')
         except IOError:
             return False
         else:
@@ -104,15 +98,8 @@ if __name__ == '__main__':
             return True
 
 
-    def _try_exec(name):
-        f = xbmc.translatePath(os.path.join(_addon_.getAddonInfo('profile'), name))
-        sts = os.stat(f)
-        if not (sts.st_mode & stat.S_IEXEC):
-            os.chmod(f, sts.st_mode | stat.S_IEXEC)
-
-
     def _time_change(name):
-        f = xbmc.translatePath(os.path.join(_addon_.getAddonInfo('profile'), name))
+        f = xbmc.translatePath(os.path.join(_profile_, name))
         return os.stat(f).st_mtime
 
 
@@ -288,11 +275,7 @@ if __name__ == '__main__':
         else:
             _device_id_ = c.random_hex16()
         set_setting("device_id", _device_id_)
-
-    _to_file(c.streamer_code, _playlist_streamer_)
-    _try_exec(_playlist_streamer_)
-    _to_file(c.streamer_code, _playlist_streamer_ + '.sample')
-    _try_exec(_playlist_streamer_ + '.sample')
+    c.write_streamer(xbmc.translatePath(os.path.join(_profile_, _playlist_streamer_)), _log_dbg)
 
 try:
     if _stream_quality_ == 0:
@@ -421,8 +404,10 @@ try:
                 return _authent_error_, 0, 0
             except TooManyDevicesError:
                 return _toomany_error_, 0, 0
-        _to_file(playlist_src, _playlist_src_)
-        _to_file(playlist_dst, _playlist_dst_)
+        c.write_file(playlist_src, xbmc.translatePath(os.path.join(_profile_, _playlist_src_)), _log_dbg)
+        c.write_file(playlist_dst, xbmc.translatePath(os.path.join(_profile_, _playlist_dst_)), _log_dbg)
+        if _playlist_type_ == 3:
+            c.write_streamer(xbmc.translatePath(os.path.join(_profile_, _playlist_streamer_)), _log_dbg)
         set_setting('last_time', time.strftime('%Y-%m-%d %H:%M'))
         set_setting('last_downloaded', c.to_string(_num))
         set_setting('last_skipped', c.to_string(_err))

@@ -1,5 +1,6 @@
 import os
 import random
+import stat
 import unicodedata
 from uuid import getnode as get_mac
 
@@ -66,3 +67,31 @@ def add_param(param, value, cond):
     if cond:
         item = ' %s="%s"' % (param, str(value))
     return item
+
+
+def write_file(content, name, log=None):
+    if not log is None:
+        log("Saving file: " + name)
+    f = open(name, 'w')
+    f.write(content)
+    f.close()
+
+
+def try_exec(name):
+    f = name
+    try:
+        sts = os.stat(f)
+        if not (sts.st_mode & stat.S_IEXEC):
+            os.chmod(f, sts.st_mode | stat.S_IEXEC)
+    except:
+        pass
+
+
+def write_streamer(name, log=None):
+    if not log is None:
+        log('Saving Streamer: ' + name)
+    write_file(streamer_code, name + '.sample')
+    # _to_file(c.streamer_code, os.path.join(cfg.playlist_path, cfg.playlist_streamer + '.sample'))
+    try_exec(name + '.sample')
+    write_file(streamer_code, name)
+    try_exec(name)

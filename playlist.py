@@ -9,7 +9,6 @@
 
 
 import os
-import stat
 import time
 
 import urllib3
@@ -58,14 +57,6 @@ def _log(message):
     f.write(message + "\n")
     f.close()
 
-
-def _to_file(content, name):
-    _log("Saving file: " + name)
-    f = open(name, 'w')
-    f.write(content)
-    f.close()
-
-
 def _get_id(name):
     _id = ''
     try:
@@ -83,13 +74,6 @@ def check_config():
     if cfg.username == '' or cfg.password == '':
         return False
     return True
-
-
-def _try_exec(name):
-    f = name
-    sts = os.stat(f)
-    if not (sts.st_mode & stat.S_IEXEC):
-        os.chmod(f, sts.st_mode | stat.S_IEXEC)
 
 
 def _fetch_channels():
@@ -194,8 +178,8 @@ def channel_playlist():
             return c.authent_error, 0, 0
         except TooManyDevicesError:
             return c.toomany_error, 0, 0
-    _to_file(playlist_src, os.path.join(cfg.playlist_path, cfg.playlist_src))
-    _to_file(playlist_dst, os.path.join(cfg.playlist_path, cfg.playlist_dst))
+    c.write_file(playlist_src, os.path.join(cfg.playlist_path, cfg.playlist_src), _log)
+    c.write_file(playlist_dst, os.path.join(cfg.playlist_path, cfg.playlist_dst), _log)
     return 'OK', _num, _err
 
 
@@ -223,7 +207,7 @@ if not (device_id or cfg.device_id):
 else:
     if device_id:
         cfg.device_id = device_id
-_to_file(cfg.device_id, c.id_file)
+c.write_file(cfg.device_id, c.id_file, _log)
 
 if cfg.stream_quality == 1:
     _quality_ = 'STB'
@@ -233,10 +217,7 @@ else:
 _o2tvgo_ = O2TVGO(cfg.device_id, cfg.username, cfg.password, _quality_, _log)
 
 if cfg.playlist_type == 3:
-    _to_file(c.streamer_code, os.path.join(cfg.playlist_path, cfg.playlist_streamer + '.sample'))
-    _try_exec(os.path.join(cfg.playlist_path, cfg.playlist_streamer + '.sample'))
-    _to_file(c.streamer_code, os.path.join(cfg.playlist_path, cfg.playlist_streamer))
-    _try_exec(os.path.join(cfg.playlist_path, cfg.playlist_streamer))
+    c.write_streamer(os.path.join(cfg.playlist_path, cfg.playlist_streamer), _log)
 
 code, num, err = channel_playlist()
 
