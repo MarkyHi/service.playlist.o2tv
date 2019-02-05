@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import os
 import random
 import stat
@@ -94,3 +97,38 @@ def write_streamer(streamer_file, playlist_file, ffmpeg_cmd, log=None):
     try_exec(streamer_file + '.sample')
     write_file(streamer_code, streamer_file)
     try_exec(streamer_file)
+
+
+def build_channel_lines(channel, channel_logo, logoname, streamer, group):
+    name = channel.name
+    logo = to_string(channel.logo_url)
+    url = to_string(channel.url())
+    epgname = name
+    epgid = name
+    r = ""
+    # číslo programu v epg
+    # viz https://www.o2.cz/file_conver/174210/_025_J411544_Razeni_televiznich_programu_O2_TV_03_2018.pdf
+    channel_weight = to_string(channel.weight)
+    # logo v mistnim souboru - kdyz soubor neexistuje, tak pouzit url
+    if (channel_logo > 1) and (logoname != ""):
+        logo = logoname
+    if cfg.playlist_type == 1:
+        r += '#EXTINF:-1'
+        r += add_param('tvg-name', epgname, cfg.channel_epg_name != 0)
+        r += add_param('tvg-id', epgid, cfg.channel_epg_id != 0)
+        r += add_param('tvg-logo', logo, cfg.channel_logo != 0)
+        r += add_param('tvg-chno', channel_weight, cfg.channel_epg_id != 0)
+        r += add_param('group-titles', group, cfg.channel_group != 0)
+        r += ', %s\n%s\n' % (name, url)
+    if (cfg.playlist_type == 2) or (cfg.playlist_type == 3):
+        r += '#EXTINF:-1'
+        r += add_param('tvg-id', epgid, cfg.channel_epg_id != 0)
+        r += add_param('tvg-logo', logo, cfg.channel_logo != 0)
+        r += add_param('tvg-chno', channel_weight, cfg.channel_epg_id != 0)
+        r += add_param('group-titles', group, cfg.channel_group != 0)
+        r += ', %s\n' % name
+        if cfg.playlist_type == 2:
+            r += '%s\n' % url
+        if cfg.playlist_type == 3:
+            r += '%s %s\n' % (streamer, name)
+    return r

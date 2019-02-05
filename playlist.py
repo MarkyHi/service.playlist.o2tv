@@ -139,38 +139,9 @@ def channel_playlist():
     _err = 0
     for channel in channels_sorted:
         try:
-            _log("Adding: " + channel.name)
-            name = channel.name
-            logo = c.to_string(channel.logo_url)
-            url = c.to_string(channel.url())
-            epgname = name
-            epgid = name
-            # číslo programu v epg
-            # viz https://www.o2.cz/file_conver/174210/_025_J411544_Razeni_televiznich_programu_O2_TV_03_2018.pdf
-            channel_weight = c.to_string(channel.weight)
-            # logo v mistnim souboru - kdyz soubor neexistuje, tak pouzit url
-            if (cfg.channel_logo > 1) and (_logo_path_file(name) != ""):
-                logo = _logo_path_file(name)
-            playlist_src += '#EXTINF:-1, %s\n%s\n' % (name, url)
-            if cfg.playlist_type == 1:
-                playlist_dst += '#EXTINF:-1'
-                playlist_dst += c.add_param('tvg-name', epgname, cfg.channel_epg_name != 0)
-                playlist_dst += c.add_param('tvg-id', epgid, cfg.channel_epg_id != 0)
-                playlist_dst += c.add_param('tvg-logo', logo, cfg.channel_logo != 0)
-                playlist_dst += c.add_param('tvg-chno', channel_weight, cfg.channel_epg_id != 0)
-                playlist_dst += c.add_param('group-titles', group, cfg.channel_group != 0)
-                playlist_dst += ', %s\n%s\n' % (name, url)
-            if (cfg.playlist_type == 2) or (cfg.playlist_type == 3):
-                playlist_dst += '#EXTINF:-1'
-                playlist_dst += c.add_param('tvg-id', epgid, cfg.channel_epg_id != 0)
-                playlist_dst += c.add_param('tvg-logo', logo, cfg.channel_logo != 0)
-                playlist_dst += c.add_param('tvg-chno', channel_weight, cfg.channel_epg_id != 0)
-                playlist_dst += c.add_param('group-titles', group, cfg.channel_group != 0)
-                playlist_dst += ', %s\n' % name
-                if cfg.playlist_type == 2:
-                    playlist_dst += '%s\n' % url
-                if cfg.playlist_type == 3:
-                    playlist_dst += '%s %s\n' % (streamer, name)
+            _log("Adding: " + c.to_string(channel.name))
+            playlist_src += '#EXTINF:-1, %s\n%s\n' % (c.to_string(channel.name), c.to_string(channel.url()))
+            playlist_dst += c.build_channel_lines(channel, cfg.channel_logo ,_logo_path_file(channel.name), streamer, group)
             _num += 1
         except ChannelIsNotBroadcastingError:
             _err += 1

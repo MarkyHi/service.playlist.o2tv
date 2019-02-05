@@ -292,7 +292,7 @@ def _reload_settings():
     else:
         _quality_ = _quality_high_
     global _o2tvgo_
-    _o2tvgo_ = O2TVGO(_device_id_, _username_, _password_, _quality_)
+    _o2tvgo_ = O2TVGO(_device_id_, _username_, _password_, _quality_, _log_dbg)
 
 
 def _logo_file(channel):
@@ -350,37 +350,8 @@ def channel_playlist():
     for channel in channels_sorted:
         try:
             log_not("Adding: " + channel.name)
-            name = channel.name
-            logo = c.to_string(channel.logo_url)
-            url = c.to_string(channel.url())
-            epgname = name
-            epgid = name
-            # číslo programu v epg
-            # viz https://www.o2.cz/file_conver/174210/_025_J411544_Razeni_televiznich_programu_O2_TV_03_2018.pdf
-            channel_weight = c.to_string(channel.weight)
-            # logo v mistnim souboru - kdyz soubor neexistuje, tak pouzit url
-            if (_channel_logo_ > 1) and (_logo_path_file(name) != ""):
-                logo = _logo_path_file(name)
-            playlist_src += '#EXTINF:-1, %s\n%s\n' % (name, url)
-            if _playlist_type_ == 1:
-                playlist_dst += '#EXTINF:-1'
-                playlist_dst += c.add_param('tvg-name', epgname, _channel_epgname_ != 0)
-                playlist_dst += c.add_param('tvg-id', epgid, _channel_epgid_ != 0)
-                playlist_dst += c.add_param('tvg-logo', logo, _channel_logo_ != 0)
-                playlist_dst += c.add_param('tvg-chno', channel_weight, _channel_epgid_ != 0)
-                playlist_dst += c.add_param('group-titles', group, _channel_group_ != 0)
-                playlist_dst += ', %s\n%s\n' % (name, url)
-            if (_playlist_type_ == 2) or (_playlist_type_ == 3):
-                playlist_dst += '#EXTINF:-1'
-                playlist_dst += c.add_param('tvg-id', epgid, _channel_epgid_ != 0)
-                playlist_dst += c.add_param('tvg-logo', logo, _channel_logo_ != 0)
-                playlist_dst += c.add_param('tvg-chno', channel_weight, _channel_epgid_ != 0)
-                playlist_dst += c.add_param('group-titles', group, _channel_group_ != 0)
-                playlist_dst += ', %s\n' % name
-                if _playlist_type_ == 2:
-                    playlist_dst += '%s\n' % url
-                if _playlist_type_ == 3:
-                    playlist_dst += '%s %s\n' % (streamer, name)
+            playlist_src += '#EXTINF:-1, %s\n%s\n' % (c.to_string(channel.name), c.to_string(channel.url()))
+            playlist_dst += c.build_channel_lines(channel, _channel_logo_, _logo_path_file(channel.name), streamer, group)
             _num += 1
         except ChannelIsNotBroadcastingError:
             log_not("... Not broadcasting. Skipped.")
