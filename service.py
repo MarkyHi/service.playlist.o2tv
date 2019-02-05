@@ -424,7 +424,6 @@ def to_master(master):
 
 if __name__ == '__main__':
     monitor = xbmc.Monitor()
-    global _addon_, _profile_, _lang_, _name_, _version_, _id_, _icon_, _playlist_path_,_playlist_src_, _playlist_dst_, _playlist_streamer_, _settings_file_, _o2tvgo_, _username_, _password_, _quality_
     _addon_ = xbmcaddon.Addon('service.playlist.o2tv')
     _profile_ = xbmc.translatePath(_addon_.getAddonInfo('profile'))
     _lang_ = _addon_.getLocalizedString
