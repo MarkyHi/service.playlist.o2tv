@@ -17,6 +17,7 @@ import xbmcgui
 import xbmcaddon
 import xbmcvfs
 import urllib3
+import traceback
 import common as c
 from o2tvgo import AuthenticationError
 from o2tvgo import ChannelIsNotBroadcastingError
@@ -534,7 +535,7 @@ if __name__ == '__main__':
                         if next_time != _next_time_:
                             set_setting('next_time', next_time)
                             _next_time_ = next_time
-                            log_not('Change of settings next time - next start: %s' % (_next_time_))
+                            log_not('Change of settings next time - next start: %s' % _next_time_)
                             change_report = True
 
                 if login_error or start_error or param_error:
@@ -564,7 +565,7 @@ if __name__ == '__main__':
                     error_report = False
                     start_report = False
                     change_report = False
-                    info_dialog(_lang_(30047) % (_next_time_))
+                    info_dialog(_lang_(30047) % _next_time_)
 
                 if (time.time() < next_time_sec) or not _start_automatic_:
                     continue
@@ -582,20 +583,27 @@ if __name__ == '__main__':
                 next_time, next_time_sec = next_time_()
                 if next_time != _next_time_:
                     set_setting('next_time', c.to_string(next_time))
-                info_dialog(_lang_(30047) % (next_time))
+                info_dialog(_lang_(30047) % next_time)
 
-            except Exception:
+            except Exception as ex:
                 info_dialog(_lang_(30042))
                 exc_type, exc_value, exc_traceback = sys.exc_info()
-                log_err('LOOP error - exc_type:%s, exc_value:%s, exc_traceback:%s' % (
-                    c.to_string(exc_type), c.to_string(exc_value), c.to_string(exc_traceback)))
+                log_err('LOOP error - exc_type: %s, exc_value: %s' % (c.to_string(exc_type), c.to_string(exc_value)))
+                tb_lines = [line.rstrip('\n') for line in
+                            traceback.format_exception(ex.__class__, ex, exc_traceback)]
+                for tb_line in tb_lines:
+                    log_err('Traceback: %s' % (c.to_string(tb_line)))
 
         info_dialog(_lang_(30043))
         log_not('DONE Service')
-    except Exception:
+    except Exception as ex:
         info_dialog(_lang_(30042))
         exc_type, exc_value, exc_traceback = sys.exc_info()
-        log_err('INIT error - exc_type:%s, exc_value:%s, exc_traceback:%s' % (
-            c.to_string(exc_type), c.to_string(exc_value), c.to_string(exc_traceback)))
+        log_err('INIT error - exc_type: %s, exc_value: %s' % (c.to_string(exc_type), c.to_string(exc_value)))
+        tb_lines = [line.rstrip('\n') for line in
+                    traceback.format_exception(ex.__class__, ex, exc_traceback)]
+        for tb_line in tb_lines:
+            log_err('Traceback: %s' % (c.to_string(tb_line)))
         info_dialog(_lang_(30043))
         log_not('DONE Service')
+
