@@ -259,6 +259,13 @@ def log_err(msg):
     log(msg, level=xbmc.LOGERROR)
 
 
+def log_traceback(exc, exc_traceback):
+    tb_lines = [line.rstrip('\n') for line in
+                traceback.format_exception(exc.__class__, exc, exc_traceback)]
+    for tb_line in tb_lines:
+        log_err('Traceback: %s' % (c.to_string(tb_line)))
+
+
 def _log_wrn(msg):
     log(msg, level=xbmc.LOGWARNING)
 
@@ -558,23 +565,16 @@ if __name__ == '__main__':
 
             except Exception as ex:
                 info_dialog(_lang_(30042))
-                exc_type, exc_value, exc_traceback = sys.exc_info()
-                log_err('LOOP error - exc_type: %s, exc_value: %s' % (c.to_string(exc_type), c.to_string(exc_value)))
-                tb_lines = [line.rstrip('\n') for line in
-                            traceback.format_exception(ex.__class__, ex, exc_traceback)]
-                for tb_line in tb_lines:
-                    log_err('Traceback: %s' % (c.to_string(tb_line)))
+                ex_type, ex_value, ex_traceback = sys.exc_info()
+                log_err('LOOP error - exc_type: %s, exc_value: %s' % (c.to_string(ex_type), c.to_string(ex_value)))
+                log_traceback(ex, ex_traceback)
 
         info_dialog(_lang_(30043))
         log_not('DONE Service')
     except Exception as ex:
         info_dialog(_lang_(30042))
-        exc_type, exc_value, exc_traceback = sys.exc_info()
-        log_err('INIT error - exc_type: %s, exc_value: %s' % (c.to_string(exc_type), c.to_string(exc_value)))
-        tb_lines = [line.rstrip('\n') for line in
-                    traceback.format_exception(ex.__class__, ex, exc_traceback)]
-        for tb_line in tb_lines:
-            log_err('Traceback: %s' % (c.to_string(tb_line)))
+        ex_type, ex_value, ex_traceback = sys.exc_info()
+        log_err('INIT error - exc_type: %s, exc_value: %s' % (c.to_string(ex_type), c.to_string(ex_value)))
+        log_traceback(ex, ex_traceback)
         info_dialog(_lang_(30043))
         log_not('DONE Service')
-
