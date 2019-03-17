@@ -141,7 +141,7 @@ def channel_playlist():
         try:
             _log("Adding: " + c.to_string(channel.name))
             playlist_src += '#EXTINF:-1, %s\n%s\n' % (c.to_string(channel.name), c.to_string(channel.url()))
-            playlist_dst += c.build_channel_lines(channel, cfg.channel_logo ,_logo_path_file(channel.name), streamer, group)
+            playlist_dst += c.build_channel_lines(channel, cfg.channel_logo ,_logo_path_file(channel.name), streamer, group, cfg.playlist_type, cfg.channel_epg_name, cfg.channel_epg_id, cfg.channel_group)
             _num += 1
         except ChannelIsNotBroadcastingError:
             _err += 1

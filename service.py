@@ -358,7 +358,7 @@ def channel_playlist():
         try:
             log_not("Adding: " + channel.name)
             playlist_src += '#EXTINF:-1, %s\n%s\n' % (c.to_string(channel.name), c.to_string(channel.url()))
-            playlist_dst += c.build_channel_lines(channel, _channel_logo_, _logo_path_file(channel.name), streamer, group)
+            playlist_dst += c.build_channel_lines(channel, _channel_logo_, _logo_path_file(channel.name), streamer, group, _playlist_type_, _channel_epgname_, _channel_epgid_, _channel_group_)
             _num += 1
         except ChannelIsNotBroadcastingError:
             log_not("... Not broadcasting. Skipped.")
