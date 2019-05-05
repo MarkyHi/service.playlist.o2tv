@@ -89,14 +89,17 @@ def write_streamer(streamer_file, playlist_file, ffmpeg_cmd, log=None):
                     '-loglevel fatal -i ${tempplaylist} -probesize 32 -reconnect_at_eof 1 -reconnect_streamed 1 ' + \
                     '-c copy -map p:${streamcount}? -f mpegts -tune zerolatency -bsf:v h264_mp4toannexb,dump_extra ' + \
                     '-mpegts_service_type digital_tv pipe:1\n'
-
-    if not log is None:
-        log('Saving Streamer: ' + streamer_file)
-    write_file(streamer_code, streamer_file + '.sample')
-    # _to_file(c.streamer_code, os.path.join(cfg.playlist_path, cfg.playlist_streamer + '.sample'))
-    try_exec(streamer_file + '.sample')
-    write_file(streamer_code, streamer_file)
-    try_exec(streamer_file)
+    if not os.path.isfile(streamer_file):
+        if not log is None:
+            log('Saving Streamer: ' + streamer_file)
+        write_file(streamer_code, streamer_file + '.sample')
+        # _to_file(c.streamer_code, os.path.join(cfg.playlist_path, cfg.playlist_streamer + '.sample'))
+        try_exec(streamer_file + '.sample')
+        write_file(streamer_code, streamer_file)
+        try_exec(streamer_file)
+    else:
+        if not log is None:
+            log('Streamer exists. Ignoring...')
 
 
 def build_channel_lines(channel, channel_logo, logoname, streamer, group, playlist_type, channel_epg_name, channel_epg_id, channel_group):

@@ -1,3 +1,6 @@
+2019-03-17 [0.6]
+ * Fixed login issues
+ 
 2018-10-21 [0.5]
  * English translation
  * Fixed login issues
