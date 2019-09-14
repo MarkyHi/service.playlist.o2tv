@@ -18,6 +18,7 @@ import config as cfg
 from o2tvgo import AuthenticationError
 from o2tvgo import ChannelIsNotBroadcastingError
 from o2tvgo import NoPurchasedServiceError
+from o2tvgo import NoPlaylistUrlsError
 from o2tvgo import O2TVGO
 from o2tvgo import TooManyDevicesError
 
@@ -72,6 +73,8 @@ def _get_id(name):
 
 
 def check_config():
+    if c.is_null_or_whitespace(cfg.playlist_path):
+        cfg.playlist_path = os.getcwd()
     if cfg.username == '' or cfg.password == '':
         return False
     return True
@@ -150,6 +153,9 @@ def channel_playlist():
             return c.authent_error, 0, 0
         except TooManyDevicesError:
             return c.toomany_error, 0, 0
+        except NoPlaylistUrlsError:
+            _log("... No playlist URL provided. Skipped.")
+            _err += 1
     c.write_file(playlist_src, os.path.join(cfg.playlist_path, cfg.playlist_src), _log)
     c.write_file(playlist_dst, os.path.join(cfg.playlist_path, cfg.playlist_dst), _log)
     return 'OK', _num, _err

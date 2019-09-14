@@ -48,12 +48,22 @@ class LiveChannel:
             self._o2tv.refresh_configuration()
         subscription_code = self._o2tv.subscription_code
         playlist = None
+        from datetime import datetime
         while access_token:
             params = {"serviceType": "LIVE_TV",
                       "subscriptionCode": subscription_code,
-                      "channelKey": self.channel_key,
+                      "channelKey": unicode(self.channel_key, "utf-8"),
                       "deviceType": self.quality,
-                      "streamingProtocol": "HLS"}  # JiRo - doplněn parametr kvality
+                      "streamingProtocol": "HLS",
+                      #"videoCodec": "H264",
+                      "encryptionType": "NONE",
+                      #"streamType":"LIVE"
+                      #"contentId": "-1",
+                      #"fromTimeStamp": int((datetime.now(tz=None) - datetime(1970,1,1)).total_seconds()),
+                      #"toTimeStamp": int((datetime(2100,1,1) - datetime(1970,1,1)).total_seconds()),
+                      #"id": "-1"
+                      #"contentId":"LIVE"
+                      }  # JiRo - doplněn parametr kvality
             headers = _COMMON_HEADERS
             cookies = {"access_token": access_token,
                        "deviceId": self._o2tv.device_id}
@@ -69,6 +79,9 @@ class LiveChannel:
                     raise ChannelIsNotBroadcastingError()
                 else:
                     raise Exception(status)
+            elif len(json_data["uris"]) < 1:
+                raise NoPlaylistUrlsError()
+                pass
             else:
                 # Pavuucek: Pokus o vynucení HD kvality
                 playlist = ""
@@ -102,6 +115,10 @@ class TooManyDevicesError(BaseException):
 
 # JiRo - doplněna kontrola zaplacené služby
 class NoPurchasedServiceError(BaseException):
+    pass
+
+#
+class NoPlaylistUrlsError(BaseException):
     pass
 
 
@@ -267,6 +284,7 @@ class O2TVGO:
                       "isp": "1",
                       "language": "ces",
                       "deviceType": quality,
+                      "imageSize": "LARGE",
                       "liveTvStreamingProtocol": "HLS",
                       "offer": offer}  # doplněn parametr kvality
             req = requests.get('http://app.o2tv.cz/sws/server/tv/channels.json',

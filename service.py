@@ -22,6 +22,7 @@ import common as c
 from o2tvgo import AuthenticationError
 from o2tvgo import ChannelIsNotBroadcastingError
 from o2tvgo import NoPurchasedServiceError
+from o2tvgo import NoPlaylistUrlsError
 from o2tvgo import O2TVGO
 from o2tvgo import TooManyDevicesError
 params = False
@@ -367,6 +368,9 @@ def channel_playlist():
             return _authent_error_, 0, 0
         except TooManyDevicesError:
             return _toomany_error_, 0, 0
+        except NoPlaylistUrlsError:
+            log_not("... No playlist URL provided. Skipped.")
+            _err += 1
     c.write_file(playlist_src, xbmc.translatePath(os.path.join(_profile_, _playlist_src_)), _log_dbg)
     c.write_file(playlist_dst, xbmc.translatePath(os.path.join(_profile_, _playlist_dst_)), _log_dbg)
     if _playlist_type_ == 3:

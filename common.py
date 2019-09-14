@@ -9,8 +9,8 @@ from uuid import getnode as get_mac
 
 import config as cfg
 
-version = '0.5'
-date = '2018-10-21'
+version = '0.6.1'
+date = '2019-09-14'
 pipe = 'pipe://'
 default_group_name = "O2TV"
 marhy = 'https://marhycz.github.io/picons/640/', 'https://marhycz.github.io/picons/1024/'
@@ -81,7 +81,7 @@ def write_streamer(streamer_file, playlist_file, ffmpeg_cmd, log=None):
                     'tempplaylist=$(mktemp -u)".m3u8"\n' + \
                     'stream=$(grep -A 1 "${source}$" ' + playlist_file + \
                     ' | head -n 2 | tail -n 1)\n' + \
-                    'wget -qO ${tempplaylist} ${stream}\n' + \
+                    'curl -L -f ${stream} -o ${tempplaylist}\n' + \
                     'streamcount=$(cat ${tempplaylist} | grep -Eo "(http|https)://[\da-z./?A-Z0-9\D=_-]*" | wc -l)\n' + \
                     'streamcount=$((streamcount-1))\n' + \
                     'if  [ "$streamcount" = "-1" ]; then streamcount=0; fi\n' + \
@@ -135,3 +135,11 @@ def build_channel_lines(channel, channel_logo, logoname, streamer, group, playli
         if playlist_type == 3:
             r += '%s %s\n' % (streamer, name)
     return r
+
+
+def is_null_or_whitespace(test_string):
+    if test_string and test_string.strip() and test_string.isspace():
+        return False
+    else:
+        return True
+

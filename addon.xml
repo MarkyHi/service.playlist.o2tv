@@ -9,6 +9,10 @@
   </extension>
   <extension point="xbmc.addon.metadata">
     <news>
+2019-09-14 [0.6.1]
+* Fix: Skip station when no playlist URL provided
+* Streamer.sh: use curl instead of wget
+
  2019-03-17 [0.6]
  * Fixed login issues
  
