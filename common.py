@@ -138,7 +138,7 @@ def build_channel_lines(channel, channel_logo, logoname, streamer, group, playli
 
 
 def is_null_or_whitespace(test_string):
-    if test_string and test_string.strip() and test_string.isspace():
+    if test_string and test_string.strip() and not test_string.isspace():
         return False
     else:
         return True
