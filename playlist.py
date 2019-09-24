@@ -8,6 +8,13 @@
 # který byl vytvořen z původního addon autora Štěpána Orta.
 
 
+from __future__ import print_function
+from __future__ import unicode_literals
+from __future__ import division
+from __future__ import absolute_import
+from builtins import open
+from future import standard_library
+standard_library.install_aliases()
 import os
 import time
 
@@ -73,8 +80,11 @@ def _get_id(name):
 
 
 def check_config():
+    path = os.getcwd()
+    if "getcwdu" in dir(os):
+        path = os.getcwdu() # pouzit unicode verzi jestli ji mame
     if c.is_null_or_whitespace(cfg.playlist_path):
-        cfg.playlist_path = os.getcwd()
+        cfg.playlist_path = path
     if cfg.username == '' or cfg.password == '':
         return False
     return True
@@ -127,7 +137,7 @@ def channel_playlist():
     channels, _code = _fetch_channels()
     if not channels:
         return _code, -1, -1
-    channels_sorted = sorted(channels.values(), key=lambda _channel: _channel.weight)
+    channels_sorted = sorted(list(channels.values()), key=lambda _channel: _channel.weight)
     if cfg.channel_group == 1:
         group = c.default_group_name
     else:
@@ -142,8 +152,8 @@ def channel_playlist():
     _err = 0
     for channel in channels_sorted:
         try:
-            _log("Adding: " + c.to_string(channel.name))
-            playlist_src += '#EXTINF:-1, %s\n%s\n' % (c.to_string(channel.name), c.to_string(channel.url()))
+            _log("Adding: %s..." % channel.name)
+            playlist_src += '#EXTINF:-1, %s\n%s\n' % (channel.name, channel.url())
             playlist_dst += c.build_channel_lines(channel, cfg.channel_logo ,_logo_path_file(channel.name), streamer, group, cfg.playlist_type, cfg.channel_epg_name, cfg.channel_epg_id, cfg.channel_group)
             _num += 1
         except ChannelIsNotBroadcastingError:

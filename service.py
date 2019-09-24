@@ -8,14 +8,21 @@ Script je odvozen z Kodi addon service.playlist.o2tv,
 který byl vytvořen z původního addon autora Štěpána Orta.
 *********************************************************
 '''
+from __future__ import division
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import absolute_import
 
+from builtins import open
+from builtins import int
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from past.utils import old_div
 import os
 import time
 import sys
-import xbmc
-import xbmcgui
-import xbmcaddon
-import xbmcvfs
+from kodi_six import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 import urllib3
 import traceback
 import common as c
@@ -243,9 +250,16 @@ def info_dialog(message, icon=_icon_, _time=5000, sound=False):
 
 def log(msg, level=xbmc.LOGDEBUG):
     global _name_
-    if type(msg).__name__ == 'unicode':
-        msg = msg.encode('utf-8')
-    xbmc.log("[%s] %s" % (_name_, msg.__str__()), level)
+    try:
+        # if (isinstance(msg, unicode)): #or (isinstance(msg, str)):
+        #    msg = bytes(msg.encode('utf-8'))
+        xbmc.log('[%s] %s' % (_name_, msg), level)
+    except Exception as e:
+        try:
+            # totalni derp.
+            xbmc.log('[%s] Logging Failure: %s' % (_name_, e), level)
+        except:
+            pass
 
 
 def log_not(msg):
@@ -264,7 +278,7 @@ def log_traceback(exc, exc_traceback):
     tb_lines = [line.rstrip('\n') for line in
                 traceback.format_exception(exc.__class__, exc, exc_traceback)]
     for tb_line in tb_lines:
-        log_err('Traceback: %s' % (c.to_string(tb_line)))
+        log_err('Traceback: %s' % tb_line)
 
 
 def _log_wrn(msg):
@@ -340,7 +354,7 @@ def channel_playlist():
     if not channels:
         return _code, -1, -1
 
-    channels_sorted = sorted(channels.values(), key=lambda _channel: _channel.weight)
+    channels_sorted = sorted(list(channels.values()), key=lambda _channel: _channel.weight)
     if _channel_group_ == 1:
         group = c.default_group_name
     else:
@@ -357,9 +371,11 @@ def channel_playlist():
     _err = 0
     for channel in channels_sorted:
         try:
-            log_not("Adding: " + channel.name)
-            playlist_src += '#EXTINF:-1, %s\n%s\n' % (c.to_string(channel.name), c.to_string(channel.url()))
-            playlist_dst += c.build_channel_lines(channel, _channel_logo_, _logo_path_file(channel.name), streamer, group, _playlist_type_, _channel_epgname_, _channel_epgid_, _channel_group_)
+            log_not("Adding: %s..." % channel.name)
+            playlist_src += '#EXTINF:-1, %s\n%s\n' % (channel.name, channel.url())
+            playlist_dst += c.build_channel_lines(channel, _channel_logo_, _logo_path_file(channel.name), streamer,
+                                                  group, _playlist_type_, _channel_epgname_, _channel_epgid_,
+                                                  _channel_group_)
             _num += 1
         except ChannelIsNotBroadcastingError:
             log_not("... Not broadcasting. Skipped.")
@@ -377,8 +393,8 @@ def channel_playlist():
         c.write_streamer(xbmc.translatePath(os.path.join(_profile_, _playlist_streamer_)),
                          xbmc.translatePath(os.path.join(_profile_, _playlist_src_)), _ffmpeg_, _log_dbg)
     set_setting('last_time', time.strftime('%Y-%m-%d %H:%M'))
-    set_setting('last_downloaded', c.to_string(_num))
-    set_setting('last_skipped', c.to_string(_err))
+    set_setting('last_downloaded', _num)
+    set_setting('last_skipped', _err)
     return _no_error_, _num, _err
 
 
@@ -389,7 +405,7 @@ def next_time_():
     act_date = time.strftime('%Y-%m-%d')
     act_start = ('%s %s:00' % (act_date, _start_hour_))
     act_start_sec = time.mktime(time.strptime(act_start, '%Y-%m-%d %H:%M'))
-    offset_raw = (act_time_sec - act_start_sec) / (start_period * 3600)
+    offset_raw = old_div((act_time_sec - act_start_sec), (start_period * 3600))
     offset = int(offset_raw)
     if offset_raw >= 0:
         offset += 1
@@ -525,7 +541,7 @@ if __name__ == '__main__':
                         error_report = True
                         info_dialog(_lang_(30048))
                         _log_wrn('Unfinished settings - login : %s, start : %s, param : %s' % (
-                            c.to_string(login_error), c.to_string(start_error), c.to_string(param_error)))
+                            login_error, start_error, param_error))
                     _log_dbg('Service running: short cycle (Unfinished settings) - time: %s' % (
                         time.strftime('%Y-%m-%d %H:%M:%S')))
                     continue
@@ -564,13 +580,13 @@ if __name__ == '__main__':
 
                 next_time, next_time_sec = next_time_()
                 if next_time != _next_time_:
-                    set_setting('next_time', c.to_string(next_time))
+                    set_setting('next_time', next_time)
                 info_dialog(_lang_(30047) % next_time)
 
             except Exception as ex:
                 info_dialog(_lang_(30042))
                 ex_type, ex_value, ex_traceback = sys.exc_info()
-                log_err('LOOP error - exc_type: %s, exc_value: %s' % (c.to_string(ex_type), c.to_string(ex_value)))
+                log_err('LOOP error - exc_type: %s, exc_value: %s' % (ex_type, ex_value))
                 log_traceback(ex, ex_traceback)
 
         info_dialog(_lang_(30043))
@@ -578,7 +594,7 @@ if __name__ == '__main__':
     except Exception as ex:
         info_dialog(_lang_(30042))
         ex_type, ex_value, ex_traceback = sys.exc_info()
-        log_err('INIT error - exc_type: %s, exc_value: %s' % (c.to_string(ex_type), c.to_string(ex_value)))
+        log_err('INIT error - exc_type: %s, exc_value: %s' % (ex_type, ex_value))
         log_traceback(ex, ex_traceback)
         info_dialog(_lang_(30043))
         log_not('DONE Service')

@@ -1,6 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from __future__ import unicode_literals
+from __future__ import print_function
+from __future__ import division
+from __future__ import absolute_import
+from builtins import open
+from future import standard_library
+
+standard_library.install_aliases()
+from builtins import hex
+from builtins import str
+from builtins import range
 import os
 import random
 import stat
@@ -40,7 +51,6 @@ def to_string(text):
 
 
 def logo_name(channel):
-    channel = unicode(channel, 'utf-8')
     channel = unicodedata.normalize('NFKD', channel)
     channel = channel.lower()
     name = ''
@@ -60,7 +70,7 @@ def add_param(param, value, cond):
 def write_file(content, name, log=None):
     if not log is None:
         log("Saving file: " + name)
-    f = open(name, 'w')
+    f = open(name, 'w', encoding="utf-8")
     f.write(content)
     f.close()
 
@@ -102,16 +112,34 @@ def write_streamer(streamer_file, playlist_file, ffmpeg_cmd, log=None):
             log('Streamer exists. Ignoring...')
 
 
-def build_channel_lines(channel, channel_logo, logoname, streamer, group, playlist_type, channel_epg_name, channel_epg_id, channel_group):
+def build_channel_lines(channel, channel_logo, logoname, streamer, group, playlist_type, channel_epg_name,
+                        channel_epg_id, channel_group):
     name = channel.name
-    logo = to_string(channel.logo_url)
-    url = to_string(channel.url())
+    logo = channel.logo_url
+    from o2tvgo import NoPlaylistUrlsError
+    try:
+        url = channel.url()
+    except NoPlaylistUrlsError:
+        retries = 1
+        done = False
+        while not done:
+            try:
+                retries += 1
+                url = channel.url()
+                if retries >= 5:
+                    done = True
+                if not is_null_or_whitespace(url):
+                    done = True
+            except NoPlaylistUrlsError:
+                pass
+        if is_null_or_whitespace(url):
+            raise NoPlaylistUrlsError()
     epgname = name
     epgid = name
     r = ""
     # číslo programu v epg
     # viz https://www.o2.cz/file_conver/174210/_025_J411544_Razeni_televiznich_programu_O2_TV_03_2018.pdf
-    channel_weight = to_string(channel.weight)
+    channel_weight = channel.weight
     # logo v mistnim souboru - kdyz soubor neexistuje, tak pouzit url
     if (channel_logo > 1) and (logoname != ""):
         logo = logoname
@@ -142,4 +170,3 @@ def is_null_or_whitespace(test_string):
         return False
     else:
         return True
-
