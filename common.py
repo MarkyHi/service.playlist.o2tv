@@ -20,8 +20,8 @@ from uuid import getnode as get_mac
 
 import config as cfg
 
-version = '0.6.1'
-date = '2019-09-14'
+version = '0.6.2'
+date = '2019-09-28'
 pipe = 'pipe://'
 default_group_name = "O2TV"
 marhy = 'https://marhycz.github.io/picons/640/', 'https://marhycz.github.io/picons/1024/'
@@ -30,6 +30,8 @@ id_file = os.path.join(cfg.playlist_path, 'device_id')
 authent_error = 'AuthenticationError'
 toomany_error = 'TooManyDevicesError'
 nopurch_error = 'NoPurchasedServiceError'
+noplaylist_error = 'NoPlaylistError'
+nochannels_error = 'NoChannelsError'
 
 
 def device_id():
@@ -116,24 +118,7 @@ def build_channel_lines(channel, channel_logo, logoname, streamer, group, playli
                         channel_epg_id, channel_group):
     name = channel.name
     logo = channel.logo_url
-    from o2tvgo import NoPlaylistUrlsError
-    try:
-        url = channel.url()
-    except NoPlaylistUrlsError:
-        retries = 1
-        done = False
-        while not done:
-            try:
-                retries += 1
-                url = channel.url()
-                if retries >= 5:
-                    done = True
-                if not is_null_or_whitespace(url):
-                    done = True
-            except NoPlaylistUrlsError:
-                pass
-        if is_null_or_whitespace(url):
-            raise NoPlaylistUrlsError()
+    url = channel.url()
     epgname = name
     epgid = name
     r = ""

@@ -17,7 +17,7 @@ from future import standard_library
 standard_library.install_aliases()
 import os
 import time
-
+import platform
 import urllib3
 
 import common as c
@@ -28,6 +28,7 @@ from o2tvgo import NoPurchasedServiceError
 from o2tvgo import NoPlaylistUrlsError
 from o2tvgo import O2TVGO
 from o2tvgo import TooManyDevicesError
+from o2tvgo import NoChannelsError
 
 urllib3.disable_warnings()
 
@@ -102,6 +103,8 @@ def _fetch_channels():
             return None, c.toomany_error
         except NoPurchasedServiceError:
             return None, c.nopurch_error
+        except NoChannelsError:
+            return None, c.nochannels_error
     return channels, 'OK'
 
 
@@ -150,6 +153,9 @@ def channel_playlist():
     playlist_dst = '#EXTM3U\n'
     _num = 0
     _err = 0
+    if len(channels_sorted) == 0:
+        _log("Failed to download channels!")
+        return c.nochannels_error , 0, 0
     for channel in channels_sorted:
         try:
             _log("Adding: %s..." % channel.name)
@@ -175,6 +181,7 @@ _cut_log(cfg.log_limit, cfg.log_reduction)
 _log("--------------------")
 _log('O2TVKodi Playlist')
 _log('Version: %s %s' % (c.version, c.date))
+_log('Python: %s' % platform.python_version())
 _log("--------------------")
 _log("Starting...")
 

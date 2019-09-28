@@ -43,19 +43,25 @@ def _to_string(text):
 class LiveChannel(object):
 
     # JiRo - doplněn parametr kvality
-    def __init__(self, o2tv, channel_key, name, logo_url, weight, quality):
+    def __init__(self, o2tv, channel_key, name, logo_url, weight, quality, log_function=None):
         self._o2tv = o2tv
         self.channel_key = channel_key
         self.name = name
         self.weight = weight
         self.logo_url = logo_url
         self._last_url = None
+        self.log_function = log_function
         self.quality = quality  # doplněn parametr kvality
+
+    def _log(self, message):
+        if self.log_function:
+            self.log_function(message)
 
     def url(self, attempts=5, delay=1000):
         if self._last_url:
             return self._last_url
         done = False
+        start_attempts = attempts
         while not done:
             self._url()
             if self._last_url:
@@ -68,6 +74,8 @@ class LiveChannel(object):
                 done = True
         if not self._last_url:
             raise NoPlaylistUrlsError()
+        if attempts < (start_attempts - 1):
+            self._log("Attempts: %d" % (start_attempts - attempts))
         return self._url()
 
     def _url(self):
@@ -149,10 +157,14 @@ class NoPurchasedServiceError(BaseException):
     pass
 
 
-#
+# Nebyl vrácen playlist
 class NoPlaylistUrlsError(BaseException):
     pass
 
+
+# Nebyl vrácen seznam kanálů
+class NoChannelsError(BaseException):
+    pass
 
 class O2TVGO(object):
 
@@ -344,7 +356,7 @@ class O2TVGO(object):
                         name = item['channelName']
                         weight = item['weight']
                         self._live_channels[channel_key] = LiveChannel(
-                            self, channel_key, name, logo, weight, quality)  # doplněn parametr kvality
+                            self, channel_key, name, logo, weight, quality, self.log_function)  # doplněn parametr kvality
             done = False
             offset = 0
             while not done:
@@ -372,4 +384,6 @@ class O2TVGO(object):
                 total_count = j['channels']['totalCount']
                 if offset >= total_count:
                     done = True
+        if len(self._live_channels) == 0:
+            raise NoChannelsError()
         return self._live_channels

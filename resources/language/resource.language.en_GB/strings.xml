@@ -10,6 +10,8 @@
     <string id="30007">Channel is not broadcasting</string>
     <string id="30008">Service is was not paid</string>
     <string id="30009">OK</string>
+    <string id="30010">Failed to download playlist</string>
+	<string id="30011">Failed to download channel list</string>
 
     <string id="30025">Report errors</string>
 

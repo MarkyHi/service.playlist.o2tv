@@ -16,6 +16,7 @@ from __future__ import absolute_import
 from builtins import open
 from builtins import int
 from future import standard_library
+
 standard_library.install_aliases()
 from builtins import str
 from past.utils import old_div
@@ -24,6 +25,7 @@ import time
 import sys
 from kodi_six import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 import urllib3
+import platform
 import traceback
 import common as c
 from o2tvgo import AuthenticationError
@@ -32,6 +34,8 @@ from o2tvgo import NoPurchasedServiceError
 from o2tvgo import NoPlaylistUrlsError
 from o2tvgo import O2TVGO
 from o2tvgo import TooManyDevicesError
+from o2tvgo import NoChannelsError
+
 params = False
 
 _username_ = ""
@@ -87,7 +91,9 @@ _no_error_ = 0
 _authent_error_ = 1
 _toomany_error_ = 2
 _nopurch_error_ = 3
-_error_code_ = 0, 1, 2, 3
+_noplaylist_error_ = 4
+_nochannels_error_ = 5
+_error_code_ = 0, 1, 2, 3, 4, 5
 
 
 def get_setting(setting):
@@ -286,7 +292,7 @@ def _log_wrn(msg):
 
 
 def _fetch_channels():
-    global _o2tvgo_, _no_error_, _nopurch_error_, _toomany_error_, _authent_error_
+    global _o2tvgo_, _no_error_, _nopurch_error_, _toomany_error_, _authent_error_, _noplaylist_error_, _nochannels_error_
     channels = None
     while not channels:
         try:
@@ -297,6 +303,8 @@ def _fetch_channels():
             return None, _toomany_error_
         except NoPurchasedServiceError:
             return None, _nopurch_error_
+        except NoChannelsError:
+            return None, _nochannels_error_
     return channels, _no_error_
 
 
@@ -369,6 +377,9 @@ def channel_playlist():
     playlist_dst = '#EXTM3U\n'
     _num = 0
     _err = 0
+    if len(channels_sorted) == 0:
+        log_err("Failed to download channels!")
+        return _nochannels_error_, 0, 0
     for channel in channels_sorted:
         try:
             log_not("Adding: %s..." % channel.name)
@@ -439,8 +450,9 @@ if __name__ == '__main__':
     addonInfo = addon().getAddonInfo
     execute = xbmc.executebuiltin
 
-    _error_str_ = 'OK', 'AuthenticationError', 'TooManyDevicesError', 'NoPurchasedServiceError'
-    _error_lang_ = 'OK', _lang_(30003), _lang_(30006), _lang_(30008)
+    _error_str_ = 'OK', 'AuthenticationError', 'TooManyDevicesError', 'NoPurchasedServiceError',\
+                  'NoPlaylistError', 'NoChannelsError'
+    _error_lang_ = _lang_(30009), _lang_(30003), _lang_(30006), _lang_(30008), _lang_(30010), _lang_(30011)
     _quality_high_ = 'STB'
     _quality_low_ = 'TABLET'
     _cycle_step_ = 5
@@ -453,7 +465,9 @@ if __name__ == '__main__':
 
     urllib3.disable_warnings()
 
-    log_not('Preparation for Service')
+    log_not('Version: %s %s' % (c.version, c.date))
+    log_not('Python: %s' % platform.python_version())
+    log_not('Preparation for Service...')
 
     load_settings(True)
     login_error, start_error, param_error = test_settings()
