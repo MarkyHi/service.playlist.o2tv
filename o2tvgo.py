@@ -7,13 +7,13 @@ from __future__ import unicode_literals
 from __future__ import print_function
 from __future__ import division
 from __future__ import absolute_import
-
 from future import standard_library
-standard_library.install_aliases()
 from builtins import str
 from builtins import object
 import requests
 import time
+
+standard_library.install_aliases()
 
 __author__ = "Štěpán Ort"
 __license__ = "MIT"
@@ -118,8 +118,8 @@ class LiveChannel(object):
                 else:
                     raise Exception(status)
             elif len(json_data["uris"]) < 1:
+                # raise NoPlaylistUrlsError()
                 return None
-                #raise NoPlaylistUrlsError()
             else:
                 # Pavuucek: Pokus o vynucení HD kvality
                 playlist = ""
@@ -165,6 +165,7 @@ class NoPlaylistUrlsError(BaseException):
 # Nebyl vrácen seznam kanálů
 class NoChannelsError(BaseException):
     pass
+
 
 class O2TVGO(object):
 
@@ -243,7 +244,7 @@ class O2TVGO(object):
             'remote_access_token': remote_access_token
         }
         requests.post('https://ottmediator.o2tv.cz:4443/ottmediator-war/loginChoiceService',
-                             data=datax, headers=headers, verify=False)
+                      data=datax, headers=headers, verify=False)
 
         _HEADERS1 = {
             'Content-Type': 'application/x-www-form-urlencoded',
@@ -356,7 +357,8 @@ class O2TVGO(object):
                         name = item['channelName']
                         weight = item['weight']
                         self._live_channels[channel_key] = LiveChannel(
-                            self, channel_key, name, logo, weight, quality, self.log_function)  # doplněn parametr kvality
+                            # doplněn parametr kvality
+                            self, channel_key, name, logo, weight, quality, self.log_function)
             done = False
             offset = 0
             while not done:

@@ -14,12 +14,10 @@ from __future__ import division
 from __future__ import absolute_import
 from builtins import open
 from future import standard_library
-standard_library.install_aliases()
 import os
 import time
 import platform
 import urllib3
-
 import common as c
 import config as cfg
 from o2tvgo import AuthenticationError
@@ -29,7 +27,7 @@ from o2tvgo import NoPlaylistUrlsError
 from o2tvgo import O2TVGO
 from o2tvgo import TooManyDevicesError
 from o2tvgo import NoChannelsError
-
+standard_library.install_aliases()
 urllib3.disable_warnings()
 
 
@@ -83,7 +81,7 @@ def _get_id(name):
 def check_config():
     path = os.getcwd()
     if "getcwdu" in dir(os):
-        path = os.getcwdu() # pouzit unicode verzi jestli ji mame
+        path = os.getcwdu()  # pouzit unicode verzi jestli ji mame
     if c.is_null_or_whitespace(cfg.playlist_path):
         cfg.playlist_path = path
     if cfg.username == '' or cfg.password == '':
@@ -155,12 +153,14 @@ def channel_playlist():
     _err = 0
     if len(channels_sorted) == 0:
         _log("Failed to download channels!")
-        return c.nochannels_error , 0, 0
+        return c.nochannels_error, 0, 0
     for channel in channels_sorted:
         try:
             _log("Adding: %s..." % channel.name)
             playlist_src += '#EXTINF:-1, %s\n%s\n' % (channel.name, channel.url())
-            playlist_dst += c.build_channel_lines(channel, cfg.channel_logo ,_logo_path_file(channel.name), streamer, group, cfg.playlist_type, cfg.channel_epg_name, cfg.channel_epg_id, cfg.channel_group)
+            playlist_dst += c.build_channel_lines(channel, cfg.channel_logo, _logo_path_file(channel.name), streamer,
+                                                  group, cfg.playlist_type, cfg.channel_epg_name, cfg.channel_epg_id,
+                                                  cfg.channel_group)
             _num += 1
         except ChannelIsNotBroadcastingError:
             _err += 1

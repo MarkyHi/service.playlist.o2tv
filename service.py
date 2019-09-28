@@ -12,12 +12,9 @@ from __future__ import division
 from __future__ import unicode_literals
 from __future__ import print_function
 from __future__ import absolute_import
-
 from builtins import open
 from builtins import int
 from future import standard_library
-
-standard_library.install_aliases()
 from builtins import str
 from past.utils import old_div
 import os
@@ -35,7 +32,7 @@ from o2tvgo import NoPlaylistUrlsError
 from o2tvgo import O2TVGO
 from o2tvgo import TooManyDevicesError
 from o2tvgo import NoChannelsError
-
+standard_library.install_aliases()
 params = False
 
 _username_ = ""
@@ -292,7 +289,8 @@ def _log_wrn(msg):
 
 
 def _fetch_channels():
-    global _o2tvgo_, _no_error_, _nopurch_error_, _toomany_error_, _authent_error_, _noplaylist_error_, _nochannels_error_
+    global _o2tvgo_, _no_error_, _nopurch_error_, _toomany_error_, _authent_error_,\
+        _noplaylist_error_, _nochannels_error_
     channels = None
     while not channels:
         try:

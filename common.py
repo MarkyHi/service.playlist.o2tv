@@ -7,8 +7,6 @@ from __future__ import division
 from __future__ import absolute_import
 from builtins import open
 from future import standard_library
-
-standard_library.install_aliases()
 from builtins import hex
 from builtins import str
 from builtins import range
@@ -17,8 +15,8 @@ import random
 import stat
 import unicodedata
 from uuid import getnode as get_mac
-
 import config as cfg
+standard_library.install_aliases()
 
 version = '0.6.2'
 date = '2019-09-28'

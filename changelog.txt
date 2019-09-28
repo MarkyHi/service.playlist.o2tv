@@ -1,3 +1,8 @@
+2019-09-28 [0.6.2]
+* Python 3 / unicode support
+* Fixed error on no channels returned [NoChannelsError]
+* update required libraries
+
 2019-09-14 [0.6.1]
 * Fix: Skip station when no playlist URL provided
 * Streamer.sh: use curl instead of wget
