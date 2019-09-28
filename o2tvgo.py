@@ -13,6 +13,7 @@ standard_library.install_aliases()
 from builtins import str
 from builtins import object
 import requests
+import time
 
 __author__ = "Štěpán Ort"
 __license__ = "MIT"
@@ -51,9 +52,25 @@ class LiveChannel(object):
         self._last_url = None
         self.quality = quality  # doplněn parametr kvality
 
-    def url(self):
+    def url(self, attempts=5, delay=1000):
         if self._last_url:
             return self._last_url
+        done = False
+        while not done:
+            self._url()
+            if self._last_url:
+                done = True
+            else:
+                #
+                time.sleep(delay / 1000)
+            attempts -= 1
+            if attempts <= 0:
+                done = True
+        if not self._last_url:
+            raise NoPlaylistUrlsError()
+        return self._url()
+
+    def _url(self):
         if not self._o2tv.access_token:
             self._o2tv.refresh_access_token()
         access_token = self._o2tv.access_token
@@ -93,7 +110,8 @@ class LiveChannel(object):
                 else:
                     raise Exception(status)
             elif len(json_data["uris"]) < 1:
-                raise NoPlaylistUrlsError()
+                return None
+                #raise NoPlaylistUrlsError()
             else:
                 # Pavuucek: Pokus o vynucení HD kvality
                 playlist = ""
