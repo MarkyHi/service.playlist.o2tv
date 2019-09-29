@@ -41,6 +41,7 @@ V současné době je známo několik problémů na které byste mohli narazit:
 - Nastavení skriptu verze 0.5 není kompatibilní s předchozími. Nachází se v jiném souboru, takže musíte zapsat veškerá nastavení znovu.
 - V případě potíží při instalaci nové verze doplňku pro Kodi pomáhá smazat adresář s nastaveními. Na windows se nachází např. v `C:\Users\jméno_uživatele\AppData\Roaming\Kodi\userdata\addon_data\service.playlist.o2tv\`.
 - Potíže s přihlášením zatím nejsou zcela vyřešeny a mohou záviset na problémech na straně O2. 
+- Pokud se skript (playlist.py) pokusíte spustit jako načasovanou úlohu přes cron, tak mu musíte vnutit kódování UTF-8 a jazyk, takže celý příkaz bude vypadat následovně: `PYTHONIOENCODING=UTF-8 LANG=en_US.UF-8 /storage/.kodi/userdata/addon_data/service.playlist.o2tv/playlist.py`
 
 Pokud jste objevili jiný problém, nebo chybu nejdříve hledejte v [seznamu chyb](https://github.com/Pavuucek/O2TVKodi/issues) a až v případě, že svojí chybu nenajdete, [vytvořte nové hlášení](https://github.com/Pavuucek/O2TVKodi/issues/new).
 
