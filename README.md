@@ -9,10 +9,12 @@ Obě části jsou víceméně funkčně stejné a slouží k témuž účelu. Kt
 Doplněk je vhodný zejména pro případy, kdy pro přehrávání používáte pouze IPTV Simple Client, nebo kdy je Kodi a TVHeadend spouštěn na jednom stroji.
 
 ### Instalace
-- Stáhněte si [poslední verzi](https://github.com/Pavuucek/O2TVKodi/releases/latest)
+- Buď si stáhněte doplňku [poslední verzi](https://github.com/Pavuucek/service.playlist.o2tv/releases/latest)
+- A nebo si stáhněte [doplněk repozitáře Pavůčina](https://github.com/Pavuucek/repository.pavucina.info/releases/latest)
 - Otevřete Kodi a povolte si **Neznámé zdroje** v **Nastavení -> Systém -> Doplňky** 
 - Nainstalujte doplněk ze staženého zip souboru
 - Proveďte nastavení doplňku - zadejte své uživatelské jméno a heslo. Doplněk najdete v sekci **Služby**
+- Pokud si nainstalujete repozitář Pavůčina, bude se vám doplněk automaticky aktualizovat při vydání nové verze.
 
 Pokud vše nastavíte správně, ve složce nastavení doplňku by se měly objevit soubory `o2tv.generic.m3u8` a `o2tv.playlist.m3u8`, které použijte pro IPTV Simple Client, nebo TVHeadend.
 Umístění složky nastavení doplňku se liší podle platformy. Na windows bývá v C:\Users\jméno_uživatele\AppData\Roaming\Kodi\userdata\addon_data\service.playlist.o2tv\
