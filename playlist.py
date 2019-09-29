@@ -35,7 +35,7 @@ def _cut_log(limit, reduction):
     if cfg.cut_log == 0:
         return
     try:
-        f = open(c.log_file, 'r')
+        f = open(c.log_file, 'r', encoding="utf-8")
         lines = f.readlines()
         f.close()
     except IOError:
@@ -51,14 +51,14 @@ def _cut_log(limit, reduction):
                 if count < limit:
                     continue
                 new_lines += line
-            f = open(c.log_file, 'w')
+            f = open(c.log_file, 'w', encoding="utf-8")
             f.write(new_lines)
             f.close()
         return
 
 
 def _log(message):
-    f = open(c.log_file, 'a')
+    f = open(c.log_file, 'a', encoding="utf-8")
     message = format('%s %s' % (time.strftime('%Y-%m-%d %H:%M:%S'), message))
     print(message)
     f.write(message + "\n")
@@ -68,7 +68,7 @@ def _log(message):
 def _get_id(name):
     _id = ''
     try:
-        f = open(name, 'r')
+        f = open(name, 'r', encoding="utf-8")
         lines = f.readlines()
     except IOError:
         return _id
