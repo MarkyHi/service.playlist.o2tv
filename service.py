@@ -16,7 +16,7 @@ from builtins import open
 from builtins import int
 from future import standard_library
 from builtins import str
-from past.utils import old_div
+# from past.utils import old_div
 import os
 import time
 import sys
@@ -414,7 +414,8 @@ def next_time_():
     act_date = time.strftime('%Y-%m-%d')
     act_start = ('%s %s:00' % (act_date, _start_hour_))
     act_start_sec = time.mktime(time.strptime(act_start, '%Y-%m-%d %H:%M'))
-    offset_raw = old_div((act_time_sec - act_start_sec), (start_period * 3600))
+    # offset_raw = old_div((act_time_sec - act_start_sec), (start_period * 3600))
+    offset_raw = (act_time_sec - act_start_sec) / (start_period * 3600)
     offset = int(offset_raw)
     if offset_raw >= 0:
         offset += 1
