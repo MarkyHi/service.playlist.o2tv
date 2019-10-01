@@ -1,3 +1,7 @@
+2019-10-01 [0.6.3]
+* Fixed Libreelec compatibility (incomplete future module)
+* Use utf-8 encoding on file operations
+
 2019-09-28 [0.6.2]
 * Python 3 / unicode support
 * Fixed error on no channels returned [NoChannelsError]
