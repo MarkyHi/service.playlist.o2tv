@@ -76,7 +76,7 @@ class LiveChannel(object):
             raise NoPlaylistUrlsError()
         if attempts < (start_attempts - 1):
             self._log("Attempts: %d" % (start_attempts - attempts))
-        return self._url()
+        return self._last_url
 
     def _url(self):
         if not self._o2tv.access_token:
