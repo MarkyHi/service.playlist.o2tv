@@ -137,7 +137,7 @@ def _logo_path_file(channel):
 def channel_playlist():
     channels, _code = _fetch_channels()
     if not channels:
-        return _code, -1, -1
+        return _code, -1, -1, -1
     channels_sorted = sorted(list(channels.values()), key=lambda _channel: _channel.weight)
     if cfg.channel_group == 1:
         group = c.default_group_name
@@ -151,9 +151,10 @@ def channel_playlist():
     playlist_dst = '#EXTM3U\n'
     _num = 0
     _err = 0
+    _cached = 0
     if len(channels_sorted) == 0:
         _log("Failed to download channels!")
-        return c.nochannels_error, 0, 0
+        return c.nochannels_error, 0, 0, 0
     for channel in channels_sorted:
         try:
             _log("Adding: %s..." % channel.name)
@@ -161,21 +162,22 @@ def channel_playlist():
             playlist_dst += c.build_channel_lines(channel, cfg.channel_logo, _logo_path_file(channel.name), streamer,
                                                   group, cfg.playlist_type, cfg.channel_epg_name, cfg.channel_epg_id,
                                                   cfg.channel_group)
-            c.cache_playlist(channel.url(), cfg.playlist_path, _log)
+            if c.cache_playlist(channel.url(), cfg.playlist_path, _log):
+                _cached += 1
             _num += 1
         except ChannelIsNotBroadcastingError:
             _err += 1
             _log("... Not broadcasting. Skipped.")
         except AuthenticationError:
-            return c.authent_error, 0, 0
+            return c.authent_error, 0, 0, 0
         except TooManyDevicesError:
-            return c.toomany_error, 0, 0
+            return c.toomany_error, 0, 0, 0
         except NoPlaylistUrlsError:
             _log("... No playlist URL provided. Skipped.")
             _err += 1
     c.write_file(playlist_src, os.path.join(cfg.playlist_path, cfg.playlist_src), _log)
     c.write_file(playlist_dst, os.path.join(cfg.playlist_path, cfg.playlist_dst), _log)
-    return 'OK', _num, _err
+    return 'OK', _num, _err, _cached
 
 
 _cut_log(cfg.log_limit, cfg.log_reduction)
@@ -217,7 +219,7 @@ if cfg.playlist_type == 3:
                      os.path.join(cfg.playlist_path, cfg.playlist_src),
                      cfg.ffmpeg_command, _log)
 
-code, num, err = channel_playlist()
+code, num, err, cached = channel_playlist()
 
-_log('Download done with result EXIT: %s , DOWNLOADED: %d, SKIPPED: %d' % (code, num, err))
+_log('Download done with result EXIT: %s , DOWNLOADED: %d, SKIPPED: %d, CACHED: %d' % (code, num, err, cached))
 _log('Finished')

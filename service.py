@@ -358,7 +358,7 @@ def channel_playlist():
         _playlist_type_, _channel_epgname_, _channel_epgid_, _ffmpeg_, _no_error_
     channels, _code = _fetch_channels()
     if not channels:
-        return _code, -1, -1
+        return _code, -1, -1, -1
 
     channels_sorted = sorted(list(channels.values()), key=lambda _channel: _channel.weight)
     if _channel_group_ == 1:
@@ -375,9 +375,10 @@ def channel_playlist():
     playlist_dst = '#EXTM3U\n'
     _num = 0
     _err = 0
+    _cached = 0
     if len(channels_sorted) == 0:
         log_err("Failed to download channels!")
-        return _nochannels_error_, 0, 0
+        return _nochannels_error_, 0, 0, 0
     for channel in channels_sorted:
         try:
             log_not("Adding: %s..." % channel.name)
@@ -385,15 +386,16 @@ def channel_playlist():
             playlist_dst += c.build_channel_lines(channel, _channel_logo_, _logo_path_file(channel.name), streamer,
                                                   group, _playlist_type_, _channel_epgname_, _channel_epgid_,
                                                   _channel_group_)
-            c.cache_playlist(channel.url(), _playlist_path_, log_not)
+            if c.cache_playlist(channel.url(), _playlist_path_, log_not):
+                _cached += 1
             _num += 1
         except ChannelIsNotBroadcastingError:
             log_not("... Not broadcasting. Skipped.")
             _err += 1
         except AuthenticationError:
-            return _authent_error_, 0, 0
+            return _authent_error_, 0, 0, 0
         except TooManyDevicesError:
-            return _toomany_error_, 0, 0
+            return _toomany_error_, 0, 0, 0
         except NoPlaylistUrlsError:
             log_not("... No playlist URL provided. Skipped.")
             _err += 1
@@ -405,7 +407,7 @@ def channel_playlist():
     set_setting('last_time', time.strftime('%Y-%m-%d %H:%M'))
     set_setting('last_downloaded', _num)
     set_setting('last_skipped', _err)
-    return _no_error_, _num, _err
+    return _no_error_, _num, _err, _cached
 
 
 def next_time_():
@@ -584,10 +586,10 @@ if __name__ == '__main__':
 
                 log_not('Download starts')
                 info_dialog(_lang_(30040))
-                code, num, err = channel_playlist()
+                code, num, err, cached = channel_playlist()
                 if code == _no_error_:
                     info_dialog(_lang_(30041) % (num, err))
-                    log_not('Download finishes %d/%d channel(s) downloaded/skipped' % (num, err))
+                    log_not('Download finishes %d/%d/%d channel(s) downloaded/skipped/cached' % (num, err, cached))
                 else:
                     info_dialog(_error_lang_[code])
                     log_not('Download aborted: %s' % (_error_str_[code]))
