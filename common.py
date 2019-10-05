@@ -106,7 +106,7 @@ def write_streamer(streamer_file, playlist_file, ffmpeg_cmd, log=None):
                     'echo "tempplaylist: ${tempplaylist}" >&2\n' + \
                     'echo "streamcount: ${streamcount}" >&2\n' + \
                     ffmpeg_cmd + ' -protocol_whitelist file,http,https,tcp,tls -fflags +genpts ' + \
-                    '-loglevel fatal -i ${tempplaylist} -probesize 32 -reconnect_at_eof 1 -reconnect_streamed 1 ' + \
+                    '-loglevel warning -i ${tempplaylist} -probesize 32 -reconnect_at_eof 1 -reconnect_streamed 1 ' + \
                     '-c copy -map p:${streamcount}? -f mpegts -tune zerolatency -bsf:v h264_mp4toannexb,dump_extra ' + \
                     '-mpegts_service_type digital_tv pipe:1\n'
     if not os.path.isfile(streamer_file):
