@@ -5,6 +5,8 @@ from __future__ import unicode_literals
 from __future__ import print_function
 from __future__ import division
 from __future__ import absolute_import
+
+import time
 from builtins import open
 from future import standard_library
 from builtins import hex
@@ -14,6 +16,8 @@ import os
 import random
 import stat
 import unicodedata
+import requests
+import shutil
 from uuid import getnode as get_mac
 import config as cfg
 standard_library.install_aliases()
@@ -68,7 +72,7 @@ def add_param(param, value, cond):
 
 
 def write_file(content, name, log=None):
-    if not log is None:
+    if log is not None:
         log("Saving file: " + name)
     f = open(name, 'w', encoding="utf-8")
     f.write(content)
@@ -88,19 +92,25 @@ def try_exec(name):
 def write_streamer(streamer_file, playlist_file, ffmpeg_cmd, log=None):
     streamer_code = '#! /bin/bash\n' + \
                     'source=$*\n' + \
-                    'tempplaylist=$(mktemp -u)".m3u8"\n' + \
-                    'stream=$(grep -A 1 "${source}$" ' + playlist_file + \
-                    ' | head -n 2 | tail -n 1)\n' + \
-                    'curl -L -f ${stream} -o ${tempplaylist}\n' + \
+                    'playlist=' + playlist_file + '\n' + \
+                    'playlistpath=$(dirname "${playlist}")"/"\n' + \
+                    'stream=$(grep -A 1 "${source}$" $playlist | head -n 2 | tail -n 1)\n' + \
+                    'tempplaylist=${playlistpath}${stream##*/}\n' + \
+                    'if [ ! -f "${tempplaylist}" ]; then tempplaylist=$(mktemp -u)".m3u8";' + \
+                    'curl -L -f ${stream} -o ${tempplaylist}; fi\n' + \
                     'streamcount=$(cat ${tempplaylist} | grep -Eo "(http|https)://[\da-z./?A-Z0-9\D=_-]*" | wc -l)\n' + \
                     'streamcount=$((streamcount-1))\n' + \
                     'if  [ "$streamcount" = "-1" ]; then streamcount=0; fi\n' + \
+                    'echo "source: ${source}" >&2\n' + \
+                    'echo "stream: ${stream}" >&2\n' + \
+                    'echo "tempplaylist: ${tempplaylist}" >&2\n' + \
+                    'echo "streamcount: ${streamcount}" >&2\n' + \
                     ffmpeg_cmd + ' -protocol_whitelist file,http,https,tcp,tls -fflags +genpts ' + \
                     '-loglevel fatal -i ${tempplaylist} -probesize 32 -reconnect_at_eof 1 -reconnect_streamed 1 ' + \
                     '-c copy -map p:${streamcount}? -f mpegts -tune zerolatency -bsf:v h264_mp4toannexb,dump_extra ' + \
                     '-mpegts_service_type digital_tv pipe:1\n'
     if not os.path.isfile(streamer_file):
-        if not log is None:
+        if log is not None:
             log('Saving Streamer: ' + streamer_file)
         write_file(streamer_code, streamer_file + '.sample')
         # _to_file(c.streamer_code, os.path.join(cfg.playlist_path, cfg.playlist_streamer + '.sample'))
@@ -108,7 +118,7 @@ def write_streamer(streamer_file, playlist_file, ffmpeg_cmd, log=None):
         write_file(streamer_code, streamer_file)
         try_exec(streamer_file)
     else:
-        if not log is None:
+        if log is not None:
             log('Streamer exists. Ignoring...')
 
 
@@ -153,3 +163,40 @@ def is_null_or_whitespace(test_string):
         return False
     else:
         return True
+
+
+def download_playlist(in_url, out_file, log=None):
+    raw = requests.get(in_url, stream=True)
+    if os.path.isfile(out_file):
+        os.remove(out_file)
+    with open(out_file, "wb") as f:
+        shutil.copyfileobj(raw.raw, f)
+    # uložili jsme prázdný soubor?
+    if os.stat(out_file).st_size == 0:
+        os.remove(out_file)
+
+
+def cache_playlist(in_url, out_path, log=None, attempts=5, delay=1000):
+    out_file = in_url.split("/")[-1]
+    out_file = os.path.join(out_path, out_file)
+    if (not out_file.endswith("m3u8")) and (not out_file.endswith("mpd")):
+        return None
+    if log is not None:
+        log("Caching playlist to %s..." % out_file)
+    done = False
+    start_attempts = attempts
+    while not done:
+        download_playlist(in_url, out_file, log)
+        if os.path.isfile(out_file) and os.stat(out_file).st_size != 0:
+            done = True
+        else:
+            time.sleep(delay / 1000)
+        attempts -= 1
+        if attempts <= 0:
+            done = True
+    if attempts < (start_attempts - 1) and log is not None:
+        log("Attempts: %d" % (start_attempts - attempts))
+    if not os.path.isfile(out_file) and os.stat(out_file).st_size == 0:
+        return None
+    else:
+        return out_file

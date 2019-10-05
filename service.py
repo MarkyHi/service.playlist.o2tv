@@ -385,6 +385,7 @@ def channel_playlist():
             playlist_dst += c.build_channel_lines(channel, _channel_logo_, _logo_path_file(channel.name), streamer,
                                                   group, _playlist_type_, _channel_epgname_, _channel_epgid_,
                                                   _channel_group_)
+            c.cache_playlist(c.cache_playlist(channel.url(), _playlist_path_, log_not))
             _num += 1
         except ChannelIsNotBroadcastingError:
             log_not("... Not broadcasting. Skipped.")
