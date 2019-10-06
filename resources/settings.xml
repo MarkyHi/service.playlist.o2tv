@@ -40,6 +40,7 @@
 		<setting label="30702" id="last_time" type="text" enable="false"/>
 		<setting label="30703" id="last_downloaded" type="text" enable="false"/>
 		<setting label="30704" id="last_skipped" type="text" enable="false"/>
+		<setting label="30706" id="last_cached" type="text" enable="false"/>
 		<setting label="30705" id="next_time" type="text" enable="false"/>
 	</category>
 </settings>

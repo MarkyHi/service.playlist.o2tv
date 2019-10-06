@@ -105,6 +105,7 @@
     <string id="30703">Channels downloaded</string>
     <string id="30704">Skipped channels</string>
     <string id="30705">Next download time</string>
+    <string id="30706">Cached playlists</string>
 
     <string id="30800">Service settings are incomplete</string>
     <string id="30801">Please set parameters for: %s %s %s</string>

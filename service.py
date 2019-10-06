@@ -61,6 +61,7 @@ _myscript_name_ = ""
 _ffmpeg_ = ""
 _last_downloaded_ = ""
 _last_skipped_ = ""
+_last_cached_ = ""
 _last_time_ = ""
 _last_start_ = ""
 _next_time_ = ""
@@ -193,6 +194,8 @@ def load_settings(save=False):
     _last_downloaded_ = get_setting('last_downloaded')
     global _last_skipped_
     _last_skipped_ = get_setting('last_skipped')
+    global _last_cached_
+    _last_cached_ = get_setting('last_cached')
     global _last_time_
     _last_time_ = get_setting('last_time')
     global _last_start_
@@ -411,6 +414,7 @@ def channel_playlist():
     set_setting('last_time', time.strftime('%Y-%m-%d %H:%M'))
     set_setting('last_downloaded', _num)
     set_setting('last_skipped', _err)
+    set_setting('last_cached', _cached)
     return _no_error_, _num, _err, _cached
 
 
