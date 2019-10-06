@@ -35,6 +35,12 @@ stream_quality = 1
 ###########################################################################################################
 # Parametry vytvářeného playlistu
 ###########################################################################################################
+# Ukládání playlistů stanic na disk. Urychluje přepínání stanic
+# True - povolit, playlisty se budou ukládat na disk
+# False - zakázat ukládání
+# Pozor na první velké písmeno.
+# Toto nastavení nemá souvislost s žádnými dalšími nastaveními
+cache_playlists = False
 # Typ playlistu
 # 1 - pro IPTV Simple Client
 # 2 - pro Tvheadend

@@ -20,7 +20,7 @@ from builtins import str
 import os
 import time
 import sys
-from kodi_six import xbmc, xbmcgui, xbmcaddon, xbmcvfs
+from kodi_six import xbmc, xbmcgui, xbmcaddon  # , xbmcvfs
 import urllib3
 import platform
 import traceback
@@ -66,6 +66,7 @@ _last_start_ = ""
 _next_time_ = ""
 _last_stest_ = ""
 _next_test_ = ""
+_cache_playlists_ = False
 _o2tvgo_ = ""
 _quality_ = 0
 _name_ = ""
@@ -202,6 +203,8 @@ def load_settings(save=False):
     _last_stest_ = get_setting('last_test')
     global _next_test_
     _next_test_ = get_setting('next_test')
+    global _cache_playlists_
+    _cache_playlists_ = get_setting_bool('cache_playlists')
 
 
 def test_settings():
@@ -355,7 +358,7 @@ def _logo_path_file(channel):
 
 def channel_playlist():
     global _channel_group_, _channel_groupname_, _myscript_, _myscript_name_, _channel_logo_, \
-        _playlist_type_, _channel_epgname_, _channel_epgid_, _ffmpeg_, _no_error_
+        _playlist_type_, _channel_epgname_, _channel_epgid_, _ffmpeg_, _no_error_, _cache_playlists_
     channels, _code = _fetch_channels()
     if not channels:
         return _code, -1, -1, -1
@@ -386,8 +389,9 @@ def channel_playlist():
             playlist_dst += c.build_channel_lines(channel, _channel_logo_, _logo_path_file(channel.name), streamer,
                                                   group, _playlist_type_, _channel_epgname_, _channel_epgid_,
                                                   _channel_group_)
-            if c.cache_playlist(channel.url(), _playlist_path_, log_not):
-                _cached += 1
+            if _cache_playlists_:
+                if c.cache_playlist(channel.url(), _playlist_path_, log_not):
+                    _cached += 1
             _num += 1
         except ChannelIsNotBroadcastingError:
             log_not("... Not broadcasting. Skipped.")

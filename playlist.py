@@ -162,8 +162,9 @@ def channel_playlist():
             playlist_dst += c.build_channel_lines(channel, cfg.channel_logo, _logo_path_file(channel.name), streamer,
                                                   group, cfg.playlist_type, cfg.channel_epg_name, cfg.channel_epg_id,
                                                   cfg.channel_group)
-            if c.cache_playlist(channel.url(), cfg.playlist_path, _log):
-                _cached += 1
+            if cfg.cache_playlists:
+                if c.cache_playlist(channel.url(), cfg.playlist_path, _log):
+                    _cached += 1
             _num += 1
         except ChannelIsNotBroadcastingError:
             _err += 1

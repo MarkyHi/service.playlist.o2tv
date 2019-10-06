@@ -17,6 +17,7 @@
         <setting label="30110" type="action" action="RunScript(service.playlist.o2tv)" visible="false"/>
 	</category>
 	<category label="30200">
+		<setting label="30313" id="cache_playlists" type="bool" default="false"/>
 	    <setting label="30201" id="playlist_type" type="enum" lvalues="30202|30203|30204|30205" sort="no" default="30202"/>
 		<setting type="sep"/>
 	    <setting label="30401" id="stream_quality" type="enum" lvalues="30402|30403" sort="no" default="30402" visible="!eq(-2,0)"/>

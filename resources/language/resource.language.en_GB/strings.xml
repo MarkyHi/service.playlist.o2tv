@@ -86,6 +86,7 @@
     <string id="30310">Use custom streamer script</string>
     <string id="30311">Script name</string>
     <string id="30312">Full FFMPEG path</string>
+    <string id="30313">Store playlists in cache</string>
 
     <string id="30400">More settings</string>
     <string id="30401">Stream Quality</string>
