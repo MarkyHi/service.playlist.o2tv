@@ -19,16 +19,15 @@ import unicodedata
 import requests
 import shutil
 from uuid import getnode as get_mac
-import config as cfg
 standard_library.install_aliases()
 
-version = '0.6.2'
+version = '0.7'
 date = '2019-09-28'
 pipe = 'pipe://'
 default_group_name = "O2TV"
 marhy = 'https://marhycz.github.io/picons/640/', 'https://marhycz.github.io/picons/1024/'
-log_file = os.path.join(cfg.playlist_path, 'playlist.log')
-id_file = os.path.join(cfg.playlist_path, 'device_id')
+log_file = 'playlist.log'
+id_file = 'device_id'
 authent_error = 'AuthenticationError'
 toomany_error = 'TooManyDevicesError'
 nopurch_error = 'NoPurchasedServiceError'

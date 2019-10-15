@@ -1,40 +1,50 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
+[Login]
 ###########################################################################################################
 # Základní parametry
 ###########################################################################################################
 # Přihlašovací jméno a heslo:
-username = ''
-password = ''
+username =
+password =
 # ID zařízení:
-device_id = ''
-# Adresář pro vytvářené soubory a případného vlastního skriptu:
-# Pozor! Je třeba zadat absolutní cestu!
-playlist_path = ''
-# Jméno souboru stahovaného playlistu
-playlist_src = 'o2tv.generic.m3u8'
-# Jméno souboru vytvářeného playlistu
-playlist_dst = 'o2tv.playlist.m3u8'
+device_id =
+# Přihlašovací token
+token =
+
+[Common]
 # Jméno souboru skriptu streameru
-playlist_streamer = 'streamer.sh'
+playlist_streamer = streamer.sh
 # Povel pro spuštění ffmpeg
-ffmpeg_command = 'ffmpeg'
+ffmpeg_command = ffmpeg
 # Použití streameru
 # 0 - bude použit vygenerovaný skript se jménem uloženým v _playlist_streamer_
 # 1 - bude použit vlastní script se zadaným jménem. Skript musí být umístěn v cestě uložené v _playlist_path_!
 my_script = 0
 # Jméno souboru vlastního skriptu streameru - jméno nesmí být shodné se jménem uloženým v _playlist_streamer_!
-my_script_name = 'myscript.sh'
+my_script_name = myscript.sh
 # Kvalita streamu
 # 0 - pro nižsí kvalitu, zpravidla (maximálně) 1280x720
 # 1 - pro vyšší kvalitu, zpravidla 1920x1080
 stream_quality = 1
-###########################################################################################################
+# Orezavani log souboru
+# 0 - neorezavat, nechat log bobtnat do obrich rozmeru :-)
+# 1 - orezavat podle nasledujicich nastaveni
+cut_log = 1
 
+log_limit = 100
+log_reduction = 50
+
+[Playlist]
 ###########################################################################################################
 # Parametry vytvářeného playlistu
 ###########################################################################################################
+# Adresář pro vytvářené soubory a případného vlastního skriptu:
+# Pozor! Je třeba zadat absolutní cestu!
+playlist_path =
+# Jméno souboru stahovaného playlistu
+playlist_src = o2tv.generic.m3u8
+# Jméno souboru vytvářeného playlistu
+playlist_dst = o2tv.playlist.m3u8
+
 # Ukládání playlistů stanic na disk. Urychluje přepínání stanic
 # True - povolit, playlisty se budou ukládat na disk
 # False - zakázat ukládání
@@ -69,8 +79,8 @@ channel_group_name = 'O2TV'
 # 3 - internetové umístění, pro url se použije obsah proměnné _channel_logourl_
 # 4 - logo od @marhycz na Github
 channel_logo = 1
-channel_logo_path = ''
-channel_logo_url = ''
+channel_logo_path =
+channel_logo_url =
 # Konvence jména souboru - používá se pro Typ loga = 2 a 3
 # 0 - nazevsouboru.png
 # 1 - nazevsouboru.jpg
@@ -81,13 +91,7 @@ channel_logo_name = 0
 # 0 - 640x640
 # 1 - 1024x1024
 channel_logo_github = 0
-# Orezavani log souboru
-# 0 - neorezavat, nechat log bobtnat do obrich rozmeru :-)
-# 1 - orezavat podle nasledujicich nastaveni
-cut_log = 1
 
-log_limit = 100
-log_reduction = 50
 ###########################################################################################################
 
 ###########################################################################################################
