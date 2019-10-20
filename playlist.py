@@ -272,7 +272,7 @@ _o2tvgo_ = O2TVGO(config.get('Login', 'device_id'), config.get('Login', 'usernam
                   config.get('Login', 'password'), _quality_, _log)
 _o2tvgo_.access_token = config.get('Login', 'access_token')
 _o2tvgo_.expires_in = config.get('Login','token_expire_date')
-_o2tvgo.app_id = 'O2TVKodi Playlist'
+_o2tvgo_.app_id = 'O2TVKodi Playlist'
 
 if config.getint('Playlist', 'playlist_type') == 3:
     c.write_streamer(os.path.join(config.get('Playlist', 'playlist_path'), config.get('Common', 'playlist_streamer')),
