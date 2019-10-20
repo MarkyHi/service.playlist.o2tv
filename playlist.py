@@ -206,7 +206,7 @@ def channel_playlist():
             playlist_src += '#EXTINF:-1, %s\n%s\n' % (channel.name, channel.url())
             playlist_dst += c.build_channel_lines(channel, config.getint('Playlist','channel_logo'),
                                                   _logo_path_file(channel.name), streamer, group,
-                                                  config.get('Playlist', 'playlist_type'),
+                                                  config.getint('Playlist', 'playlist_type'),
                                                   config.getint('Playlist', 'channel_epg_name'),
                                                   config.getint('Playlist', 'channel_epg_id'),
                                                   config.getint('Playlist', 'channel_group'))
