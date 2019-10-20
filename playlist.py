@@ -241,10 +241,7 @@ _log("Starting...")
 set_default_config()
 with codecs.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.ini'), 'r', encoding='utf-8') as f:
     config.read_file(f)
-ts=config.getint('Login','token_expire_date')
-ts += datetime.timestamp(datetime.now())
-print(datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S'))
-exit()
+
 if not check_config():
     _log('Invalid username or password.')
     _log('Please check config.ini')
@@ -275,6 +272,7 @@ _o2tvgo_ = O2TVGO(config.get('Login', 'device_id'), config.get('Login', 'usernam
                   config.get('Login', 'password'), _quality_, _log)
 _o2tvgo_.access_token = config.get('Login', 'access_token')
 _o2tvgo_.expires_in = config.get('Login','token_expire_date')
+_o2tvgo.app_id = 'O2TVKodi Playlist'
 
 if config.getint('Playlist', 'playlist_type') == 3:
     c.write_streamer(os.path.join(config.get('Playlist', 'playlist_path'), config.get('Common', 'playlist_streamer')),
@@ -282,13 +280,11 @@ if config.getint('Playlist', 'playlist_type') == 3:
                      config.get('Common', 'ffmpeg_command'), _log)
 
 code, num, err, cached = channel_playlist()
+_log('Download done with result EXIT: %s , DOWNLOADED: %d, SKIPPED: %d, CACHED: %d' % (code, num, err, cached))
 _log('Updating config...')
 config.set('Login', 'access_token', _o2tvgo_.access_token)
 config.set('Login', 'token_expire_date', str(_o2tvgo_.expires_in))
 with codecs.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.ini'), 'wb+', encoding='utf-8')\
         as configfile:
     config.write(configfile)
-ts=int(_o2tvgo_.expires_in)
-print(datetime.utcfromtimestamp(ts).strftime('%Y-%m-%d %H:%M:%S'))
-_log('Download done with result EXIT: %s , DOWNLOADED: %d, SKIPPED: %d, CACHED: %d' % (code, num, err, cached))
 _log('Finished')
