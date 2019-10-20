@@ -7,6 +7,9 @@ from __future__ import unicode_literals
 from __future__ import print_function
 from __future__ import division
 from __future__ import absolute_import
+
+import datetime
+
 from future import standard_library
 from builtins import str
 from builtins import object
@@ -21,7 +24,6 @@ __version__ = "1.1.8"
 __email__ = "stepanort@gmail.com"
 
 _COMMON_HEADERS = {"X-NanguTv-App-Version": "Android#6.4.1",
-                   "X-NanguTv-Device-Name": "O2TVKodi",
                    "User-Agent": "Dalvik/2.1.0",
                    "Accept-Encoding": "gzip",
                    "Connection": "Keep-Alive"}
@@ -102,8 +104,10 @@ class LiveChannel(object):
                       # "contentId":"LIVE"
                       }  # JiRo - doplněn parametr kvality
             headers = _COMMON_HEADERS
+            headers["X-NanguTv-Device-Name"] = self._o2tv.app_id
             cookies = {"access_token": access_token,
                        "deviceId": self._o2tv.device_id}
+            self._o2tv.delay()
             req = requests.get('http://app.o2tv.cz/sws/server/streaming/uris.json',
                                params=params, headers=headers, cookies=cookies)
             req.encoding = req.apparent_encoding
@@ -169,7 +173,7 @@ class NoChannelsError(BaseException):
 
 class O2TVGO(object):
 
-    def __init__(self, device_id, username, password, quality, log_function=None):  # JiRo - doplněn parametr kvality
+    def __init__(self, device_id, username, password, quality, log_function=None, app_id='O2TVKodi', request_delay=1000):  # JiRo - doplněn parametr kvality
         self.username = username
         self.password = password
         self._live_channels = {}
@@ -181,8 +185,16 @@ class O2TVGO(object):
         self.tariff = None
         self.expires_in = None
         self.device_id = device_id
+        self.app_id = app_id
+        self.request_delay = request_delay
+        self._last_delay = None
         self.quality = quality  # JiRo - doplněn parametr kvality
         self.log_function = log_function
+
+    def delay(self):
+        if self._last_delay:
+            time.sleep(self.request_delay / 1000)
+        self._last_delay = datetime.datetime.now()
 
     def _log(self, message):
         if self.log_function:
@@ -193,6 +205,7 @@ class O2TVGO(object):
         if not self.username or not self.password:
             raise AuthenticationError()
         headers = _COMMON_HEADERS
+        headers["X-NanguTv-Device-Name"] = self.app_id
         headers["Content-Type"] = "application/x-www-form-urlencoded;charset=UTF-8"
         data = {'grant_type': 'password',
                 'client_id': 'tef-web-portal-etnetera',
@@ -201,6 +214,7 @@ class O2TVGO(object):
                 'password': self.password,
                 'platform_id': '231a7d6678d00c65f6f3b2aaa699a0d0',
                 'language': 'cs'}
+        self.delay()
         req = requests.post('https://oauth.o2tv.cz/oauth/token',
                             data=data, headers=headers, verify=False)
         req.encoding = req.apparent_encoding
@@ -233,6 +247,7 @@ class O2TVGO(object):
             'username': self.username,
             'password': self.password
         }
+        self.delay()
         req = requests.post('https://ottmediator.o2tv.cz:4443/ottmediator-war/login',
                             data=data, headers=headers, verify=False)
         req.encoding = req.apparent_encoding
@@ -244,6 +259,7 @@ class O2TVGO(object):
             'service_id': service_id,
             'remote_access_token': remote_access_token
         }
+        self.delay()
         requests.post('https://ottmediator.o2tv.cz:4443/ottmediator-war/loginChoiceService',
                       data=datax, headers=headers, verify=False)
 
@@ -262,6 +278,7 @@ class O2TVGO(object):
             'authority': 'tef-sso',
             'isp_id': '1'
         }
+        self.delay()
         req1 = requests.post('https://oauth.o2tv.cz/oauth/token',
                              data=data1, headers=headers1, verify=False)
         req1.encoding = req1.apparent_encoding
@@ -294,7 +311,9 @@ class O2TVGO(object):
             self.refresh_access_token()
         access_token = self.access_token
         headers = _COMMON_HEADERS
+        headers["X-NanguTv-Device-Name"] = self.app_id
         cookies = {"access_token": access_token, "deviceId": self.device_id}
+        self.delay()
         req = requests.get(
             'http://app.o2tv.cz/sws/subscription/settings/subscription-configuration.json', headers=headers,
             cookies=cookies)
@@ -329,6 +348,7 @@ class O2TVGO(object):
         quality = self.quality  # JiRo - doplněn parametr kvality
         if len(self._live_channels) == 0:
             headers = _COMMON_HEADERS
+            headers["X-NanguTv-Device-Name"] = self.app_id
             cookies = {"access_token": access_token,
                        "deviceId": self.device_id}
             params = {"locality": locality,
@@ -339,6 +359,7 @@ class O2TVGO(object):
                       "imageSize": "LARGE",
                       "liveTvStreamingProtocol": "HLS",
                       "offer": offer}  # doplněn parametr kvality
+            self.delay()
             req = requests.get('http://app.o2tv.cz/sws/server/tv/channels.json',
                                params=params, headers=headers, cookies=cookies)
             req.encoding = req.apparent_encoding
@@ -365,11 +386,13 @@ class O2TVGO(object):
             offset = 0
             while not done:
                 headers = _COMMON_HEADERS
+                headers["X-NanguTv-Device-Name"] = self.app_id
                 params = {"language": "ces",
                           "audience": "over_18",
                           "channelKey": list(self._live_channels.keys()),
                           "limit": 30,
                           "offset": offset}
+                self.delay()
                 req = requests.get(
                     'http://www.o2tv.cz/mobile/tv/channels.json', params=params, headers=headers)
                 req.encoding = req.apparent_encoding
