@@ -327,6 +327,9 @@ def _reload_settings():
         _quality_ = _quality_high_
     global _o2tvgo_
     _o2tvgo_ = O2TVGO(_device_id_, _username_, _password_, _quality_, _log_dbg)
+    _o2tvgo_.access_token = get_setting('access_token')
+    _o2tvgo_.expires_in = get_setting('token_expire_date')
+    _o2tvgo_.app_id = 'O2TVKodi Service'
 
 
 def _logo_file(channel):
@@ -515,6 +518,9 @@ if __name__ == '__main__':
             _quality_ = _quality_high_
 
         _o2tvgo_ = O2TVGO(_device_id_, _username_, _password_, _quality_, _log_dbg)
+        _o2tvgo_.access_token = get_setting('access_token')
+        _o2tvgo_.expires_in = get_setting('token_expire_date')
+        _o2tvgo_.app_id = 'O2TVKodi Service'
 
         log_not('Waiting %s s for Service' % _start_delay_)
         xbmc.sleep(_start_delay_ * 1000)
@@ -592,6 +598,8 @@ if __name__ == '__main__':
                 if (time.time() < next_time_sec) or not _start_automatic_:
                     continue
 
+                set_setting('access_token',_o2tvgo_.access_token)
+                set_setting('token_expire_date',_o2tvgo_.expires_in)
                 log_not('Download starts')
                 info_dialog(_lang_(30040))
                 code, num, err, cached = channel_playlist()

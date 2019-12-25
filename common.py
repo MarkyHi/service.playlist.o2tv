@@ -19,6 +19,12 @@ import unicodedata
 import requests
 import shutil
 from uuid import getnode as get_mac
+
+try:
+    from configparser import ConfigParser as SafeConfigParser
+except ImportError:
+    from ConfigParser import SafeConfigParser  # ver. < 3.0
+
 standard_library.install_aliases()
 
 version = '0.7'
@@ -199,3 +205,46 @@ def cache_playlist(in_url, out_path, log=None, attempts=5, delay=1000):
         return None
     else:
         return out_file
+
+
+def set_default_config(config):
+    config.add_section('Login')
+    config.set('Login', 'username', '')
+    config.set('Login', 'password', '')
+    config.set('Login', 'device_id', '')
+    config.set('Login', 'access_token', '')
+    config.set('Login', 'refresh_token', '')
+    config.set('Login', 'token_expire_date', '')
+    config.add_section('Common')
+    config.set('Common', 'playlist_streamer', 'streamer.sh')
+    config.set('Common', 'ffmpeg_command', 'ffmpeg')
+    config.set('Common', 'my_script', '0')
+    config.set('Common', 'my_script_name', 'myscript.sh')
+    config.set('Common', 'stream_quality', '1')
+    config.set('Common', 'cut_log', '1')
+    config.set('Common', 'log_limit', '100')
+    config.set('Common', 'log_reduction', '50')
+    config.add_section('Playlist')
+    config.set('Playlist', 'playlist_path', '')
+    config.set('Playlist', 'playlist_src', 'o2tv.generic.m3u8')
+    config.set('Playlist', 'playlist_dst', 'o2tv.playlist.m3u8')
+    config.set('Playlist', 'cache_playlists', 'False')
+    config.set('Playlist', 'playlist_type', '3')
+    config.set('Playlist', 'channel_epg_name', '1')
+    config.set('Playlist', 'channel_epg_id', '1')
+    config.set('Playlist', 'channel_group', '1')
+    config.set('Playlist', 'channel_group_name', 'O2TV')
+    config.set('Playlist', 'channel_logo', '1')
+    config.set('Playlist', 'channel_logo_path', '')
+    config.set('Playlist', 'channel_logo_url', '')
+    config.set('Playlist', 'channel_logo_name', '0')
+    config.set('Playlist', 'channel_logo_github', '0')
+
+
+def check_config(config):
+    path = os.path.dirname(os.path.abspath(__file__))
+    if is_null_or_whitespace(config.get('Playlist', 'playlist_path')):
+        config.set('Playlist', 'playlist_path', path)
+    if config.get('Login', 'username') == '' or config.get('Login', 'password') == '':
+        return False
+    return True

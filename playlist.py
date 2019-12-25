@@ -38,14 +38,15 @@ urllib3.disable_warnings()
 
 config = SafeConfigParser()
 
+
 def _cut_log(limit, reduction):
     global config
     if config.getint('Common', 'cut_log') == 0:
         return
     try:
-        f = open(c.log_file, 'r', encoding="utf-8")
-        lines = f.readlines()
-        f.close()
+        file = open(c.log_file, 'r', encoding="utf-8")
+        lines = file.readlines()
+        file.close()
     except IOError:
         return
     else:
@@ -59,76 +60,31 @@ def _cut_log(limit, reduction):
                 if count < limit:
                     continue
                 new_lines += line
-            f = open(c.log_file, 'w', encoding="utf-8")
-            f.write(new_lines)
-            f.close()
+            file = open(c.log_file, 'w', encoding="utf-8")
+            file.write(new_lines)
+            file.close()
         return
 
 
 def _log(message):
-    f = open(c.log_file, 'a', encoding="utf-8")
+    file = open(c.log_file, 'a', encoding="utf-8")
     message = format('%s %s' % (time.strftime('%Y-%m-%d %H:%M:%S'), message))
     print(message)
-    f.write(message + "\n")
-    f.close()
+    file.write(message + "\n")
+    file.close()
 
 
 def _get_id(name):
     _id = ''
     try:
-        f = open(name, 'r', encoding="utf-8")
-        lines = f.readlines()
+        file = open(name, 'r', encoding="utf-8")
+        lines = file.readlines()
     except IOError:
         return _id
     else:
         _id = lines[0].rstrip()
-        f.close()
+        file.close()
         return _id
-
-
-def check_config():
-    global config
-    path = os.path.dirname(os.path.abspath(__file__))
-    if c.is_null_or_whitespace(config.get('Playlist', 'playlist_path')):
-        config.set('Playlist', 'playlist_path', path)
-    if config.get('Login', 'username') == '' or config.get('Login', 'password') == '':
-        return False
-    return True
-
-
-def set_default_config():
-    global config
-    config.add_section('Login')
-    config.set('Login', 'username', '')
-    config.set('Login', 'password', '')
-    config.set('Login', 'device_id', '')
-    config.set('Login', 'access_token', '')
-    config.set('Login', 'refresh_token', '')
-    config.set('Login', 'token_expire_date','')
-    config.add_section('Common')
-    config.set('Common', 'playlist_streamer', 'streamer.sh')
-    config.set('Common', 'ffmpeg_command', 'ffmpeg')
-    config.set('Common', 'my_script', '0')
-    config.set('Common', 'my_script_name', 'myscript.sh')
-    config.set('Common', 'stream_quality', '1')
-    config.set('Common', 'cut_log', '1')
-    config.set('Common', 'log_limit', '100')
-    config.set('Common', 'log_reduction', '50')
-    config.add_section('Playlist')
-    config.set('Playlist', 'playlist_path', '')
-    config.set('Playlist', 'playlist_src', 'o2tv.generic.m3u8')
-    config.set('Playlist', 'playlist_dst', 'o2tv.playlist.m3u8')
-    config.set('Playlist', 'cache_playlists', 'False')
-    config.set('Playlist', 'playlist_type', '3')
-    config.set('Playlist', 'channel_epg_name', '1')
-    config.set('Playlist', 'channel_epg_id', '1')
-    config.set('Playlist', 'channel_group', '1')
-    config.set('Playlist', 'channel_group_name', 'O2TV')
-    config.set('Playlist', 'channel_logo', '1')
-    config.set('Playlist', 'channel_logo_path', '')
-    config.set('Playlist', 'channel_logo_url', '')
-    config.set('Playlist', 'channel_logo_name', '0')
-    config.set('Playlist', 'channel_logo_github', '0')
 
 
 def _fetch_channels():
@@ -151,16 +107,16 @@ def _fetch_channels():
 def _logo_file(channel):
     global config
     if config.getint('Playlist', 'channel_logo_name') == 0:
-        f = c.logo_name(channel) + '.png'
+        logo = c.logo_name(channel) + '.png'
     elif config.getint('Playlist', 'channel_logo_name') == 1:
-        f = c.logo_name(channel) + '.jpg'
+        logo = c.logo_name(channel) + '.jpg'
     elif config.getint('Playlist', 'channel_logo_name') == 2:
-        f = channel + '.png'
+        logo = channel + '.png'
     elif config.getint('Playlist', 'channel_logo_name') == 3:
-        f = channel + '.jpg'
+        logo = channel + '.jpg'
     else:
         return ''
-    return f
+    return logo
 
 
 def _logo_path_file(channel):
@@ -189,9 +145,11 @@ def channel_playlist():
     else:
         group = config.get('Playlist', 'channel_group_name')
     if config.getboolean('Common', 'my_script'):
-        streamer = c.pipe + os.path.join(config.get('Playlist', 'playlist_path'), config.get('Common', 'my_script_name'))
+        streamer = c.pipe + os.path.join(config.get('Playlist', 'playlist_path'),
+                                         config.get('Common', 'my_script_name'))
     else:
-        streamer = c.pipe + os.path.join(config.get('Playlist', 'playlist_path'), config.get('Common','playlist_streamer'))
+        streamer = c.pipe + os.path.join(config.get('Playlist', 'playlist_path'),
+                                         config.get('Common', 'playlist_streamer'))
     playlist_src = '#EXTM3U\n'
     playlist_dst = '#EXTM3U\n'
     _num = 0
@@ -204,7 +162,7 @@ def channel_playlist():
         try:
             _log("Adding: %s..." % channel.name)
             playlist_src += '#EXTINF:-1, %s\n%s\n' % (channel.name, channel.url())
-            playlist_dst += c.build_channel_lines(channel, config.getint('Playlist','channel_logo'),
+            playlist_dst += c.build_channel_lines(channel, config.getint('Playlist', 'channel_logo'),
                                                   _logo_path_file(channel.name), streamer, group,
                                                   config.getint('Playlist', 'playlist_type'),
                                                   config.getint('Playlist', 'channel_epg_name'),
@@ -238,11 +196,11 @@ _log('Python: %s' % platform.python_version())
 _log("--------------------")
 _log("Starting...")
 
-set_default_config()
+c.set_default_config(config)
 with codecs.open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.ini'), 'r', encoding='utf-8') as f:
     config.read_file(f)
 
-if not check_config():
+if not c.check_config(config):
     _log('Invalid username or password.')
     _log('Please check config.ini')
     exit()
@@ -271,7 +229,7 @@ else:
 _o2tvgo_ = O2TVGO(config.get('Login', 'device_id'), config.get('Login', 'username'),
                   config.get('Login', 'password'), _quality_, _log)
 _o2tvgo_.access_token = config.get('Login', 'access_token')
-_o2tvgo_.expires_in = config.get('Login','token_expire_date')
+_o2tvgo_.expires_in = config.get('Login', 'token_expire_date')
 _o2tvgo_.app_id = 'O2TVKodi Playlist'
 
 if config.getint('Playlist', 'playlist_type') == 3:
